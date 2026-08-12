@@ -1,0 +1,228 @@
+<ui5-dynamic-page class="block h-full" header-pinned>
+  <ui5-dynamic-page-title slot="titleArea">
+    <ui5-title slot="heading" level="H3" class="block p-5 pb-0 lg:p-4 lg:pb-0">{{ go()?.name || ('gos.term' | translate) }}</ui5-title>
+    <ui5-label slot="subheading" class="block px-5 lg:px-4">{{ go()?.category || ('gos.term' | translate) }}</ui5-label>
+    <ui5-title slot="snappedHeading" level="H4" class="block pl-5 lg:pl-4">{{ go()?.name || ('gos.term' | translate) }}</ui5-title>
+    <ui5-label slot="snappedSubheading" class="block pl-5 lg:pl-4">{{ go()?.category || ('gos.term' | translate) }}</ui5-label>
+    <ui5-toolbar slot="actionsBar" class="pr-5 lg:pr-4">
+      <ui5-toolbar-spacer></ui5-toolbar-spacer>
+      @if (!editing()) {
+        <ui5-toolbar-button icon="edit" [text]="'common.edit' | translate" [disabled]="!go()" (click)="startEdit()"></ui5-toolbar-button>
+        <ui5-toolbar-button icon="delete" [text]="'common.delete' | translate" [disabled]="!go()" (click)="requestDelete()"></ui5-toolbar-button>
+      } @else {
+        <ui5-toolbar-button icon="save" [text]="'common.save' | translate" [disabled]="saving()" (click)="save()"></ui5-toolbar-button>
+        <ui5-toolbar-button [text]="'common.cancel' | translate" (click)="cancelEdit()"></ui5-toolbar-button>
+      }
+      <ui5-toolbar-button
+        [icon]="fullScreen ? 'exit-full-screen' : 'full-screen'"
+        [tooltip]="(fullScreen ? 'common.exitFullScreen' : 'common.fullScreen') | translate"
+        (click)="toggleFullScreen()"
+      ></ui5-toolbar-button>
+      <ui5-toolbar-button icon="decline" [tooltip]="'common.close' | translate" (click)="close()"></ui5-toolbar-button>
+    </ui5-toolbar>
+  </ui5-dynamic-page-title>
+
+  <ui5-dynamic-page-header slot="headerArea">
+    @if (!editing()) {
+      <div class="p-5 lg:p-4">
+        <ui5-label class="block text-gray-500">{{ 'common.description' | translate }}</ui5-label>
+        <ui5-text class="block">{{ go()?.description || '—' }}</ui5-text>
+      </div>
+    } @else {
+      <div class="p-5 lg:p-4 flex flex-col gap-4 lg:gap-3 max-w-xl">
+        <ui5-label>{{ 'common.name' | translate }}</ui5-label>
+        <ui5-input [value]="editName" (input)="editName = $any($event.target).value"></ui5-input>
+        <ui5-label>{{ 'common.description' | translate }}</ui5-label>
+        <ui5-textarea [value]="editDescription" (input)="editDescription = $any($event.target).value" rows="4"></ui5-textarea>
+        <ui5-label>{{ 'common.category' | translate }}</ui5-label>
+        <ui5-input [value]="editCategory" (input)="editCategory = $any($event.target).value"></ui5-input>
+
+        <div class="grid grid-cols-3 gap-4 lg:gap-3">
+          <div>
+            <ui5-label class="block">{{ 'common.type' | translate }}</ui5-label>
+            <ui5-select class="block w-full" [value]="editType" (change)="editType = $any($event.target).value">
+              <ui5-option value="" [selected]="editType === ''">—</ui5-option>
+              <ui5-option value="PHYSICAL" [selected]="editType === 'PHYSICAL'">PHYSICAL</ui5-option>
+              <ui5-option value="VIRTUAL" [selected]="editType === 'VIRTUAL'">VIRTUAL</ui5-option>
+            </ui5-select>
+          </div>
+          <div>
+            <ui5-label class="block">{{ 'gos.importance' | translate }}</ui5-label>
+            <ui5-select class="block w-full" [value]="editImportance" (change)="editImportance = $any($event.target).value">
+              <ui5-option value="" [selected]="editImportance === ''">—</ui5-option>
+              <ui5-option value="LOW" [selected]="editImportance === 'LOW'">LOW</ui5-option>
+              <ui5-option value="MEDIUM" [selected]="editImportance === 'MEDIUM'">MEDIUM</ui5-option>
+              <ui5-option value="HIGH" [selected]="editImportance === 'HIGH'">HIGH</ui5-option>
+              <ui5-option value="CRITICAL" [selected]="editImportance === 'CRITICAL'">CRITICAL</ui5-option>
+            </ui5-select>
+          </div>
+          <div>
+            <ui5-label class="block">{{ 'gos.criticality' | translate }}</ui5-label>
+            <ui5-select class="block w-full" [value]="editCriticality" (change)="editCriticality = $any($event.target).value">
+              <ui5-option value="" [selected]="editCriticality === ''">—</ui5-option>
+              <ui5-option value="PUBLIC" [selected]="editCriticality === 'PUBLIC'">PUBLIC</ui5-option>
+              <ui5-option value="INTERNAL" [selected]="editCriticality === 'INTERNAL'">INTERNAL</ui5-option>
+              <ui5-option value="PRIVATE" [selected]="editCriticality === 'PRIVATE'">PRIVATE</ui5-option>
+              <ui5-option value="CONFIDENTIAL" [selected]="editCriticality === 'CONFIDENTIAL'">CONFIDENTIAL</ui5-option>
+            </ui5-select>
+          </div>
+        </div>
+
+        <ui5-label>{{ 'gos.parent' | translate }}</ui5-label>
+        <ui5-select class="block w-full" [value]="editParentId" (change)="editParentId = $any($event.target).value">
+          <ui5-option value="" [selected]="editParentId === ''">{{ 'common.topLevel' | translate }}</ui5-option>
+          @for (option of parentOptions(); track option.id) {
+            <ui5-option [value]="option.id" [selected]="editParentId === option.id">{{ option.name }}</ui5-option>
+          }
+        </ui5-select>
+      </div>
+    }
+  </ui5-dynamic-page-header>
+
+  <div class="p-5 lg:p-4 flex flex-col gap-5 lg:gap-4">
+    @if (error()) {
+      <ui5-message-strip design="Negative" class="block">{{ error() }}</ui5-message-strip>
+    }
+
+    @if (loading()) {
+      <ui5-busy-indicator [active]="true" class="block"></ui5-busy-indicator>
+    } @else if (go()) {
+      @let g = go()!;
+
+      @if (!editing()) {
+        <div class="flex flex-wrap gap-6 lg:gap-5 text-sm">
+          <div>
+            <ui5-label class="block text-gray-500">{{ 'common.type' | translate }}</ui5-label>
+            <ui5-text class="block">{{ g.type || '—' }}</ui5-text>
+          </div>
+          <div>
+            <ui5-label class="block text-gray-500">{{ 'gos.importance' | translate }}</ui5-label>
+            <ui5-text class="block">{{ g.importance || '—' }}</ui5-text>
+          </div>
+          <div>
+            <ui5-label class="block text-gray-500">{{ 'gos.criticality' | translate }}</ui5-label>
+            <ui5-text class="block">{{ g.criticality || '—' }}</ui5-text>
+          </div>
+          <div>
+            <ui5-label class="block text-gray-500">{{ 'gos.parent' | translate }}</ui5-label>
+            <ui5-text class="block">{{ parentName() || ('common.topLevel' | translate) }}</ui5-text>
+          </div>
+        </div>
+      }
+
+      <div>
+        <div class="flex items-center gap-2 mb-2 lg:mb-1">
+          <ui5-label class="text-gray-500">{{ 'gos.customProperties' | translate }}</ui5-label>
+          @if (editing()) {
+            <ui5-button design="Transparent" icon="add" (click)="addCustomProperty()"></ui5-button>
+          }
+        </div>
+
+        @if (!editing()) {
+          @if (g.customProperties.length) {
+            <table class="text-sm">
+              @for (prop of g.customProperties; track prop.key) {
+                <tr>
+                  <td class="pr-5 lg:pr-4 py-1 font-medium">{{ prop.key }}</td>
+                  <td class="text-gray-600 py-1">{{ prop.value || '—' }}</td>
+                </tr>
+              }
+            </table>
+          } @else {
+            <ui5-text class="block text-gray-400">—</ui5-text>
+          }
+        } @else {
+          <div class="flex flex-col gap-3 lg:gap-2">
+            @for (prop of editCustomProps; track $index) {
+              <div class="flex items-center gap-3 lg:gap-2">
+                <ui5-input
+                  class="w-40"
+                  [placeholder]="'gos.key' | translate"
+                  [value]="prop.key"
+                  (input)="prop.key = $any($event.target).value"
+                ></ui5-input>
+                <ui5-input
+                  class="flex-1"
+                  [placeholder]="'gos.value' | translate"
+                  [value]="prop.value"
+                  (input)="prop.value = $any($event.target).value"
+                ></ui5-input>
+                <ui5-button design="Transparent" icon="delete" (click)="removeCustomProperty($index)"></ui5-button>
+              </div>
+            }
+            @if (!editCustomProps.length) {
+              <ui5-text class="block text-gray-400">—</ui5-text>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <ui5-label class="block text-gray-500 mb-2 lg:mb-1">{{ 'gos.usedInSipocs' | translate }}</ui5-label>
+        @if (g.lipokUsages.length) {
+          <table class="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
+            <thead>
+              <tr class="bg-gray-50 text-left">
+                <th class="px-4 py-2.5 lg:px-3 lg:py-2 font-bold">{{ 'gos.columnSipoc' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (usage of g.lipokUsages; track usage.lipokId) {
+                <tr class="border-t border-gray-200 cursor-pointer hover:bg-gray-50" (click)="openLipok(usage.lipokId)">
+                  <td class="px-4 py-2.5 lg:px-3 lg:py-2 font-medium text-blue-700">{{ usage.lipokName }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <ui5-text class="block text-gray-400">—</ui5-text>
+        }
+      </div>
+
+      @if (hierarchyRows().length) {
+        <div>
+          <ui5-label class="block text-gray-500 mb-2 lg:mb-1">{{ 'gos.hierarchy' | translate }}</ui5-label>
+          <table class="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
+            <thead>
+              <tr class="bg-gray-50 text-left">
+                <th class="px-4 py-2.5 lg:px-3 lg:py-2 font-bold">{{ 'common.name' | translate }}</th>
+                <th class="px-4 py-2.5 lg:px-3 lg:py-2 font-bold">{{ 'common.description' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of hierarchyRows(); track row.id) {
+                <tr
+                  class="border-t border-gray-200 cursor-pointer hover:bg-gray-50"
+                  [class.bg-blue-50]="row.id === id"
+                  (click)="openHierarchyGo(row.id)"
+                >
+                  <td class="px-4 py-2.5 lg:px-3 lg:py-2" [style.padding-left.rem]="row.depth * 1.25 + 1">
+                    <span [class.font-bold]="row.id === id" [class.text-blue-700]="row.id === id">{{ row.name }}</span>
+                  </td>
+                  <td class="px-4 py-2.5 lg:px-3 lg:py-2 text-gray-600">{{ row.description || '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (g.audit) {
+        <div class="text-sm text-gray-500 border-t pt-3">
+          <div>{{ 'common.createdBy' | translate: { date: (g.audit.createdAt | date: 'medium'), by: (g.audit.createdBy || '—') } }}</div>
+          <div>{{ 'common.updatedBy' | translate: { date: (g.audit.updatedAt | date: 'medium'), by: (g.audit.updatedBy || '—') } }}</div>
+        </div>
+      }
+    }
+  </div>
+</ui5-dynamic-page>
+
+<ui5-dialog [open]="deleteDialogOpen()" [headerText]="'gos.deleteDialogTitle' | translate">
+  <div class="p-5 lg:p-4 min-w-[20rem]">
+    <ui5-text>{{ 'gos.deleteConfirm' | translate: { name: go()?.name } }}</ui5-text>
+  </div>
+  <div slot="footer" class="flex justify-end gap-3 lg:gap-2 p-3 lg:p-2">
+    <ui5-button design="Transparent" (click)="cancelDelete()">{{ 'common.cancel' | translate }}</ui5-button>
+    <ui5-button design="Negative" (click)="confirmDelete()">{{ 'common.delete' | translate }}</ui5-button>
+  </div>
+</ui5-dialog>

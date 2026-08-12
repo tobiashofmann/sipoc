@@ -1,0 +1,536 @@
+<ui5-dynamic-page class="block h-full" header-pinned>
+  <ui5-dynamic-page-title slot="titleArea">
+    <ui5-title slot="heading" level="H3" class="block p-5 pb-0 lg:p-4 lg:pb-0">{{ sipoc()?.name || ('sipoc.term' | translate) }}</ui5-title>
+    <ui5-label slot="subheading" class="block px-5 lg:px-4">{{ 'sipoc.term' | translate }}</ui5-label>
+    <ui5-title slot="snappedHeading" level="H4" class="block pl-5 lg:pl-4">{{ sipoc()?.name || ('sipoc.term' | translate) }}</ui5-title>
+    <ui5-label slot="snappedSubheading" class="block pl-5 lg:pl-4">{{ 'sipoc.term' | translate }}</ui5-label>
+    <ui5-toolbar slot="actionsBar" class="pr-5 lg:pr-4">
+      <ui5-toolbar-spacer></ui5-toolbar-spacer>
+      @if (!editing()) {
+        <ui5-toolbar-button
+          icon="download"
+          [text]="'sipoc.export' | translate"
+          [disabled]="!sipoc() || exporting()"
+          (click)="exportMarkdown()"
+        ></ui5-toolbar-button>
+        <ui5-toolbar-button icon="edit" [text]="'common.edit' | translate" [disabled]="!sipoc()" (click)="startEdit()"></ui5-toolbar-button>
+        <ui5-toolbar-button icon="delete" [text]="'common.delete' | translate" [disabled]="!sipoc()" (click)="requestDelete()"></ui5-toolbar-button>
+      } @else {
+        <ui5-toolbar-button icon="save" [text]="'common.save' | translate" [disabled]="saving()" (click)="save()"></ui5-toolbar-button>
+        <ui5-toolbar-button [text]="'common.cancel' | translate" (click)="cancelEdit()"></ui5-toolbar-button>
+      }
+      <ui5-toolbar-button
+        [icon]="fullScreen ? 'exit-full-screen' : 'full-screen'"
+        [tooltip]="(fullScreen ? 'common.exitFullScreen' : 'common.fullScreen') | translate"
+        (click)="toggleFullScreen()"
+      ></ui5-toolbar-button>
+      <ui5-toolbar-button icon="decline" [tooltip]="'common.close' | translate" (click)="close()"></ui5-toolbar-button>
+    </ui5-toolbar>
+  </ui5-dynamic-page-title>
+
+  <ui5-dynamic-page-header slot="headerArea">
+    @if (!editing()) {
+      <div class="p-5 lg:p-4">
+        <ui5-label class="block text-gray-500">{{ 'common.description' | translate }}</ui5-label>
+        <ui5-text class="block">{{ sipoc()?.description || '—' }}</ui5-text>
+      </div>
+    } @else {
+      <div class="p-5 lg:p-4 flex flex-col gap-4 lg:gap-3 max-w-xl">
+        <ui5-label>{{ 'common.name' | translate }}</ui5-label>
+        <ui5-input [value]="editName" (input)="editName = $any($event.target).value"></ui5-input>
+        <ui5-label>{{ 'common.description' | translate }}</ui5-label>
+        <ui5-textarea [value]="editDescription" (input)="editDescription = $any($event.target).value" rows="4"></ui5-textarea>
+      </div>
+    }
+  </ui5-dynamic-page-header>
+
+  <div class="p-5 lg:p-4 flex flex-col gap-5 lg:gap-4">
+    @if (error()) {
+      <ui5-message-strip design="Negative" class="block">{{ error() }}</ui5-message-strip>
+    }
+
+    @if (loading()) {
+      <ui5-busy-indicator [active]="true" class="block"></ui5-busy-indicator>
+    } @else if (sipoc()) {
+      @let s = sipoc()!;
+
+      <div>
+        <div class="flex items-center gap-2 lg:gap-1 mb-2 lg:mb-1">
+          <ui5-label class="font-bold">{{ 'sipoc.gosHeading' | translate }}</ui5-label>
+          @if (editing()) {
+            <ui5-button design="Transparent" icon="add" (click)="openAddDialog('go')"></ui5-button>
+          }
+        </div>
+        @if (s.gos.length) {
+          <table class="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
+            <thead>
+              <tr class="bg-gray-50 text-left">
+                <th class="px-4 py-2.5 lg:px-3 lg:py-2 font-bold">{{ 'common.name' | translate }}</th>
+                <th class="px-4 py-2.5 lg:px-3 lg:py-2 font-bold">{{ 'common.description' | translate }}</th>
+                @if (editing()) {
+                  <th class="px-4 py-2.5 lg:px-3 lg:py-2 w-10"></th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (go of s.gos; track go.id) {
+                <tr class="border-t border-gray-200">
+                  <td class="px-4 py-2.5 lg:px-3 lg:py-2">{{ go.name }}</td>
+                  <td class="px-4 py-2.5 lg:px-3 lg:py-2 text-gray-600">{{ go.description || '—' }}</td>
+                  @if (editing()) {
+                    <td class="px-4 py-2.5 lg:px-3 lg:py-2">
+                      <ui5-button design="Transparent" icon="delete" (click)="removeEntity('go', go.id, $event)"></ui5-button>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <ui5-text class="block text-gray-400">—</ui5-text>
+        }
+      </div>
+
+      <div class="flex items-center gap-2 lg:gap-1 mb-2 lg:mb-1">
+        <ui5-label class="font-bold">{{ 'sipoc.lipoksHeading' | translate }}</ui5-label>
+      </div>
+
+      <div #columnsContainer class="relative grid grid-cols-5 gap-5 lg:gap-4" lang="de" (click)="clearSelection()">
+        <div class="flex flex-col gap-4 lg:gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 lg:p-3">
+          <div class="flex items-center justify-center gap-2 lg:gap-1">
+            <ui5-label class="font-bold">{{ 'sipoc.columnSupplier' | translate }}</ui5-label>
+            @if (editing()) {
+              <ui5-button design="Transparent" icon="add" (click)="openAddDialog('supplier')"></ui5-button>
+            }
+          </div>
+          @for (item of s.suppliers; track item.id) {
+            <div
+              [attr.data-tile]="'supplier:' + item.id"
+              [draggable]="editing()"
+              (dragstart)="onSupplierDragStart($event, item.id); onReorderDragStart($event, 'supplier', item.id)"
+              (dragend)="onReorderDragEnd()"
+              (dragover)="allowReorderDrop($event, 'supplier', 'supplier:' + item.id)"
+              (dragleave)="clearDragOver()"
+              (drop)="onReorderDrop($event, 'supplier', item.id)"
+              (click)="selectTile('supplier:' + item.id, $event)"
+              class="relative rounded-md border border-orange-300 bg-orange-100 px-4 py-3 lg:px-3 lg:py-2 text-center text-sm font-medium text-orange-900 transition-opacity break-words [hyphens:auto]"
+              [class.cursor-grab]="editing()"
+              [class.ring-2]="dragOverTile() === 'supplier:' + item.id && !reorderDropPosition()"
+              [class.ring-blue-500]="dragOverTile() === 'supplier:' + item.id && !reorderDropPosition()"
+              [class.border-t-4]="isReorderDropBefore('supplier:' + item.id)"
+              [class.border-b-4]="isReorderDropAfter('supplier:' + item.id)"
+              [class.border-blue-500]="isReorderDropBefore('supplier:' + item.id) || isReorderDropAfter('supplier:' + item.id)"
+              [class.opacity-25]="isDimmed('supplier:' + item.id)"
+            >
+              @if (editing()) {
+                <button
+                  type="button"
+                  class="absolute -top-2.5 -right-2.5 lg:-top-2 lg:-right-2 flex h-6 w-6 lg:h-5 lg:w-5 cursor-pointer items-center justify-center rounded-full border border-red-600 bg-white text-xs leading-none text-red-600 shadow"
+                  (click)="removeEntity('supplier', item.id, $event)"
+                >×</button>
+              }
+              {{ item.name }}
+            </div>
+          } @empty {
+            <span class="text-center text-gray-400">—</span>
+          }
+          @if (editing()) {
+            <div
+              class="flex-1"
+              (dragover)="allowReorderColumnEndDrop($event, 'supplier')"
+              (drop)="onReorderColumnEndDrop($event, 'supplier')"
+            ></div>
+          }
+        </div>
+
+        <div class="flex flex-col gap-4 lg:gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 lg:p-3">
+          <div class="flex items-center justify-center gap-2 lg:gap-1">
+            <ui5-label class="font-bold">{{ 'sipoc.columnInput' | translate }}</ui5-label>
+            @if (editing()) {
+              <ui5-button design="Transparent" icon="add" (click)="openAddDialog('input')"></ui5-button>
+            }
+          </div>
+          @for (item of s.inputs; track item.id) {
+            <div
+              [attr.data-tile]="'input:' + item.id"
+              [draggable]="editing()"
+              (dragstart)="onReorderDragStart($event, 'input', item.id)"
+              (dragend)="onReorderDragEnd()"
+              (dragover)="allowSupplierDrop($event, 'input:' + item.id); allowReorderDrop($event, 'input', 'input:' + item.id)"
+              (dragleave)="clearDragOver()"
+              (drop)="onInputDrop($event, item); onReorderDrop($event, 'input', item.id)"
+              (click)="selectTile('input:' + item.id, $event)"
+              class="relative rounded-md border border-green-300 bg-green-100 px-4 py-3 lg:px-3 lg:py-2 text-center text-sm font-medium text-green-900 transition-opacity break-words [hyphens:auto]"
+              [class.cursor-grab]="editing()"
+              [class.ring-2]="dragOverTile() === 'input:' + item.id && !reorderDropPosition()"
+              [class.ring-blue-500]="dragOverTile() === 'input:' + item.id && !reorderDropPosition()"
+              [class.border-t-4]="isReorderDropBefore('input:' + item.id)"
+              [class.border-b-4]="isReorderDropAfter('input:' + item.id)"
+              [class.border-blue-500]="isReorderDropBefore('input:' + item.id) || isReorderDropAfter('input:' + item.id)"
+              [class.opacity-25]="isDimmed('input:' + item.id)"
+            >
+              @if (editing()) {
+                <button
+                  type="button"
+                  class="absolute -top-2.5 -right-2.5 lg:-top-2 lg:-right-2 flex h-6 w-6 lg:h-5 lg:w-5 cursor-pointer items-center justify-center rounded-full border border-red-600 bg-white text-xs leading-none text-red-600 shadow"
+                  (click)="removeEntity('input', item.id, $event)"
+                >×</button>
+              }
+              {{ item.name }}
+            </div>
+          } @empty {
+            <span class="text-center text-gray-400">—</span>
+          }
+          @if (editing()) {
+            <div
+              class="flex-1"
+              (dragover)="allowReorderColumnEndDrop($event, 'input')"
+              (drop)="onReorderColumnEndDrop($event, 'input')"
+            ></div>
+          }
+        </div>
+
+        <div class="flex flex-col gap-4 lg:gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 lg:p-3">
+          <div class="flex items-center justify-center gap-2 lg:gap-1">
+            <ui5-label class="font-bold">{{ 'sipoc.columnProcess' | translate }}</ui5-label>
+            @if (editing()) {
+              <ui5-button design="Transparent" icon="add" (click)="openAddDialog('processStep')"></ui5-button>
+            }
+          </div>
+          @for (item of orderedProcessSteps(); track item.lipokProcessStepId) {
+            <div
+              [attr.data-tile]="'process:' + item.lipokProcessStepId"
+              class="relative rounded-md border border-blue-300 bg-blue-100 px-4 py-3 lg:px-3 lg:py-2 text-sm font-medium text-blue-900"
+            >
+              @if (editing()) {
+                <button
+                  type="button"
+                  class="absolute -top-2.5 -right-2.5 lg:-top-2 lg:-right-2 flex h-6 w-6 lg:h-5 lg:w-5 cursor-pointer items-center justify-center rounded-full border border-red-600 bg-white text-xs leading-none text-red-600 shadow"
+                  (click)="removeEntity('processStep', item.id, $event)"
+                >×</button>
+              }
+              <div class="text-center break-words [hyphens:auto]">{{ item.name }}</div>
+              @if (editing()) {
+                <ui5-select class="mt-1 block w-full" (change)="setPredecessor(item, $event)">
+                  <ui5-option value="" [selected]="item.predecessorId === null">{{ 'sipoc.startOption' | translate }}</ui5-option>
+                  @for (candidate of s.processSteps; track candidate.lipokProcessStepId) {
+                    @if (candidate.lipokProcessStepId !== item.lipokProcessStepId) {
+                      <ui5-option
+                        [value]="'' + candidate.lipokProcessStepId"
+                        [selected]="item.predecessorId === candidate.lipokProcessStepId"
+                      >
+                        {{ 'sipoc.afterPrefix' | translate: { name: candidate.name } }}
+                      </ui5-option>
+                    }
+                  }
+                </ui5-select>
+              }
+            </div>
+          } @empty {
+            <span class="text-center text-gray-400">—</span>
+          }
+        </div>
+
+        <div class="flex flex-col gap-4 lg:gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 lg:p-3">
+          <div class="flex items-center justify-center gap-2 lg:gap-1">
+            <ui5-label class="font-bold">{{ 'sipoc.columnOutput' | translate }}</ui5-label>
+            @if (editing()) {
+              <ui5-button design="Transparent" icon="add" (click)="openAddDialog('output')"></ui5-button>
+            }
+          </div>
+          @for (item of s.outputs; track item.id) {
+            <div
+              [attr.data-tile]="'output:' + item.id"
+              [draggable]="editing()"
+              (dragstart)="onOutputDragStart($event, item.lipokOutputId); onReorderDragStart($event, 'output', item.id)"
+              (dragend)="onReorderDragEnd()"
+              (dragover)="allowReorderDrop($event, 'output', 'output:' + item.id)"
+              (dragleave)="clearDragOver()"
+              (drop)="onReorderDrop($event, 'output', item.id)"
+              (click)="selectTile('output:' + item.id, $event)"
+              class="relative rounded-md border border-yellow-300 bg-yellow-100 px-4 py-3 lg:px-3 lg:py-2 text-center text-sm font-medium text-yellow-900 transition-opacity break-words [hyphens:auto]"
+              [class.cursor-grab]="editing()"
+              [class.ring-2]="dragOverTile() === 'output:' + item.id && !reorderDropPosition()"
+              [class.ring-blue-500]="dragOverTile() === 'output:' + item.id && !reorderDropPosition()"
+              [class.border-t-4]="isReorderDropBefore('output:' + item.id)"
+              [class.border-b-4]="isReorderDropAfter('output:' + item.id)"
+              [class.border-blue-500]="isReorderDropBefore('output:' + item.id) || isReorderDropAfter('output:' + item.id)"
+              [class.opacity-25]="isDimmed('output:' + item.id)"
+            >
+              @if (editing()) {
+                <button
+                  type="button"
+                  class="absolute -top-2.5 -right-2.5 lg:-top-2 lg:-right-2 flex h-6 w-6 lg:h-5 lg:w-5 cursor-pointer items-center justify-center rounded-full border border-red-600 bg-white text-xs leading-none text-red-600 shadow"
+                  (click)="removeEntity('output', item.id, $event)"
+                >×</button>
+              }
+              {{ item.name }}
+            </div>
+          } @empty {
+            <span class="text-center text-gray-400">—</span>
+          }
+          @if (editing()) {
+            <div
+              class="flex-1"
+              (dragover)="allowReorderColumnEndDrop($event, 'output')"
+              (drop)="onReorderColumnEndDrop($event, 'output')"
+            ></div>
+          }
+        </div>
+
+        <div class="flex flex-col gap-4 lg:gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 lg:p-3">
+          <div class="flex items-center justify-center gap-2 lg:gap-1">
+            <ui5-label class="font-bold">{{ 'sipoc.columnCustomer' | translate }}</ui5-label>
+            @if (editing()) {
+              <ui5-button design="Transparent" icon="add" (click)="openAddDialog('customer')"></ui5-button>
+            }
+          </div>
+          @for (item of s.customers; track item.id) {
+            <div
+              [attr.data-tile]="'customer:' + item.id"
+              [draggable]="editing()"
+              (dragstart)="onReorderDragStart($event, 'customer', item.id)"
+              (dragend)="onReorderDragEnd()"
+              (dragover)="allowOutputDrop($event, 'customer:' + item.id); allowReorderDrop($event, 'customer', 'customer:' + item.id)"
+              (dragleave)="clearDragOver()"
+              (drop)="onCustomerDrop($event, item.id); onReorderDrop($event, 'customer', item.id)"
+              (click)="selectTile('customer:' + item.id, $event)"
+              class="relative rounded-md border border-red-300 bg-red-100 px-4 py-3 lg:px-3 lg:py-2 text-center text-sm font-medium text-red-900 transition-opacity break-words [hyphens:auto]"
+              [class.cursor-grab]="editing()"
+              [class.ring-2]="dragOverTile() === 'customer:' + item.id && !reorderDropPosition()"
+              [class.ring-blue-500]="dragOverTile() === 'customer:' + item.id && !reorderDropPosition()"
+              [class.border-t-4]="isReorderDropBefore('customer:' + item.id)"
+              [class.border-b-4]="isReorderDropAfter('customer:' + item.id)"
+              [class.border-blue-500]="isReorderDropBefore('customer:' + item.id) || isReorderDropAfter('customer:' + item.id)"
+              [class.opacity-25]="isDimmed('customer:' + item.id)"
+            >
+              @if (editing()) {
+                <button
+                  type="button"
+                  class="absolute -top-2.5 -right-2.5 lg:-top-2 lg:-right-2 flex h-6 w-6 lg:h-5 lg:w-5 cursor-pointer items-center justify-center rounded-full border border-red-600 bg-white text-xs leading-none text-red-600 shadow"
+                  (click)="removeEntity('customer', item.id, $event)"
+                >×</button>
+              }
+              {{ item.name }}
+            </div>
+          } @empty {
+            <span class="text-center text-gray-400">—</span>
+          }
+          @if (editing()) {
+            <div
+              class="flex-1"
+              (dragover)="allowReorderColumnEndDrop($event, 'customer')"
+              (drop)="onReorderColumnEndDrop($event, 'customer')"
+            ></div>
+          }
+        </div>
+
+        <svg class="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
+          @for (line of lines(); track $index) {
+            <path
+              [attr.d]="line.path"
+              fill="none"
+              [attr.stroke]="line.color"
+              stroke-width="1.5"
+              [class.opacity-25]="isLineDimmed(line)"
+            ></path>
+            <circle [attr.cx]="line.x1" [attr.cy]="line.y1" r="3" [attr.fill]="line.color" [class.opacity-25]="isLineDimmed(line)"></circle>
+            <circle [attr.cx]="line.x2" [attr.cy]="line.y2" r="3" [attr.fill]="line.color" [class.opacity-25]="isLineDimmed(line)"></circle>
+            @if (line.selectable) {
+              <path
+                [attr.d]="line.path"
+                fill="none"
+                stroke="transparent"
+                stroke-width="12"
+                style="pointer-events: auto; cursor: pointer;"
+                (click)="selectLine(line, $event)"
+              ></path>
+            }
+
+            @if (editing() && line.removable; as removable) {
+              <g
+                class="cursor-pointer"
+                style="pointer-events: auto;"
+                (click)="removable.remove()"
+              >
+                <circle [attr.cx]="removable.x" [attr.cy]="removable.y" r="7" fill="white" stroke="#374151" stroke-width="1.5"></circle>
+                <line
+                  [attr.x1]="removable.x - 3"
+                  [attr.y1]="removable.y - 3"
+                  [attr.x2]="removable.x + 3"
+                  [attr.y2]="removable.y + 3"
+                  stroke="#374151"
+                  stroke-width="1.5"
+                ></line>
+                <line
+                  [attr.x1]="removable.x - 3"
+                  [attr.y1]="removable.y + 3"
+                  [attr.x2]="removable.x + 3"
+                  [attr.y2]="removable.y - 3"
+                  stroke="#374151"
+                  stroke-width="1.5"
+                ></line>
+              </g>
+            }
+          }
+        </svg>
+      </div>
+
+      @if (editing()) {
+        <p class="text-xs text-gray-400">
+          {{ 'sipoc.dragHint' | translate }}
+        </p>
+      }
+
+      <div>
+        <ui5-title level="H4" class="block mb-2 lg:mb-1">{{ 'sipoc.commentsHeading' | translate }}</ui5-title>
+
+        @if (commentError()) {
+          <ui5-message-strip design="Negative" class="block mb-2">{{ commentError() }}</ui5-message-strip>
+        }
+
+        @if (s.comments.length) {
+          <div class="flex flex-col gap-3 lg:gap-2 mb-4 lg:mb-3">
+            @for (comment of s.comments; track comment.id) {
+              <div class="relative rounded-md border border-gray-200 bg-gray-50 p-4 lg:p-3">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="text-xs font-bold text-gray-500">#{{ comment.number }}</span>
+                  <div class="flex items-center gap-1">
+                    <span class="text-xs text-gray-400">{{ comment.createdAt | date: 'medium' }}</span>
+                    @if (editingCommentId() !== comment.id) {
+                      <ui5-button design="Transparent" icon="edit" (click)="startEditComment(comment)"></ui5-button>
+                    }
+                  </div>
+                </div>
+
+                @if (editingCommentId() === comment.id) {
+                  <div class="flex flex-col gap-2 max-w-2xl">
+                    <ui5-textarea
+                      rows="3"
+                      [value]="editingCommentText()"
+                      (input)="editingCommentText.set($any($event.target).value)"
+                    ></ui5-textarea>
+                    <div class="flex justify-end gap-2">
+                      <ui5-button design="Transparent" (click)="cancelEditComment()">{{ 'common.cancel' | translate }}</ui5-button>
+                      <ui5-button
+                        design="Emphasized"
+                        icon="save"
+                        [disabled]="savingComment() || !editingCommentText().trim()"
+                        (click)="saveEditComment()"
+                      >{{ 'common.save' | translate }}</ui5-button>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="comment-content text-sm" [innerHTML]="renderMarkdown(comment.content)"></div>
+                }
+
+                @if (editing()) {
+                  <button
+                    type="button"
+                    class="absolute -top-2.5 -right-2.5 lg:-top-2 lg:-right-2 flex h-6 w-6 lg:h-5 lg:w-5 cursor-pointer items-center justify-center rounded-full border border-red-600 bg-white text-xs leading-none text-red-600 shadow"
+                    (click)="removeComment(comment.id)"
+                  >×</button>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <ui5-text class="block text-gray-400 mb-4 lg:mb-3">{{ 'sipoc.noComments' | translate }}</ui5-text>
+        }
+
+        <div class="flex flex-col gap-2 max-w-2xl">
+          <ui5-textarea
+            [placeholder]="'sipoc.commentPlaceholder' | translate"
+            rows="3"
+            [value]="newCommentText()"
+            (input)="newCommentText.set($any($event.target).value)"
+          ></ui5-textarea>
+          <ui5-button
+            class="self-end"
+            design="Emphasized"
+            [disabled]="addingComment() || !newCommentText().trim()"
+            (click)="addComment()"
+          >{{ 'sipoc.addComment' | translate }}</ui5-button>
+        </div>
+      </div>
+
+      @if (s.audit) {
+        <div class="text-sm text-gray-500 border-t pt-3">
+          <div>{{ 'common.createdBy' | translate: { date: (s.audit.createdAt | date: 'medium'), by: (s.audit.createdBy || '—') } }}</div>
+          <div>{{ 'common.updatedBy' | translate: { date: (s.audit.updatedAt | date: 'medium'), by: (s.audit.updatedBy || '—') } }}</div>
+        </div>
+      }
+    }
+  </div>
+</ui5-dynamic-page>
+
+<ui5-dialog [open]="deleteDialogOpen()" [headerText]="'sipoc.deleteDialogTitle' | translate">
+  <div class="p-5 lg:p-4 min-w-[20rem]">
+    <ui5-text>{{ 'sipoc.deleteConfirm' | translate: { name: sipoc()?.name } }}</ui5-text>
+  </div>
+  <div slot="footer" class="flex justify-end gap-3 lg:gap-2 p-3 lg:p-2">
+    <ui5-button design="Transparent" (click)="cancelDelete()">{{ 'common.cancel' | translate }}</ui5-button>
+    <ui5-button design="Negative" (click)="confirmDelete()">{{ 'common.delete' | translate }}</ui5-button>
+  </div>
+</ui5-dialog>
+
+<ui5-dialog [open]="!!addDialogKind()" [headerText]="'sipoc.addDialogTitle' | translate: { label: addDialogLabel() }">
+  <div class="p-5 lg:p-4 min-w-[24rem] max-w-[28rem] flex flex-col gap-4 lg:gap-3">
+    @if (addError()) {
+      <ui5-message-strip design="Negative" class="block">{{ addError() }}</ui5-message-strip>
+    }
+
+    <ui5-segmented-button>
+      <ui5-segmented-button-item [selected]="addMode() === 'existing'" (click)="setAddMode('existing')">
+        {{ 'sipoc.selectExisting' | translate }}
+      </ui5-segmented-button-item>
+      <ui5-segmented-button-item [selected]="addMode() === 'new'" (click)="setAddMode('new')">
+        {{ 'sipoc.createNew' | translate }}
+      </ui5-segmented-button-item>
+    </ui5-segmented-button>
+
+    @if (addMode() === 'existing') {
+      <ui5-input
+        [placeholder]="'common.search' | translate"
+        show-clear-icon
+        [value]="catalogSearch()"
+        (input)="catalogSearch.set($any($event.target).value)"
+      >
+        <ui5-icon slot="icon" name="search"></ui5-icon>
+      </ui5-input>
+
+      @if (catalogLoading()) {
+        <ui5-busy-indicator [active]="true" class="block"></ui5-busy-indicator>
+      } @else {
+        <ui5-list class="block max-h-72 overflow-auto">
+          @for (option of filteredCatalogOptions(); track option.id) {
+            <ui5-li (click)="selectExisting(option.id)">{{ option.name }}</ui5-li>
+          } @empty {
+            <ui5-li [disabled]="true">{{ 'common.noMatchingEntries' | translate }}</ui5-li>
+          }
+        </ui5-list>
+      }
+    } @else {
+      <ui5-label>{{ 'common.name' | translate }}</ui5-label>
+      <ui5-input [value]="newEntryName" (input)="newEntryName = $any($event.target).value"></ui5-input>
+      <ui5-label>{{ 'common.description' | translate }}</ui5-label>
+      <ui5-textarea [value]="newEntryDescription" (input)="newEntryDescription = $any($event.target).value" rows="3"></ui5-textarea>
+
+      @if (newEntryNeedsType()) {
+        <ui5-label>{{ 'common.type' | translate }}</ui5-label>
+        <ui5-select [value]="newEntryType" (change)="newEntryType = $any($event.target).value">
+          <ui5-option value="TEXT" [selected]="newEntryType === 'TEXT'">TEXT</ui5-option>
+          <ui5-option value="DOCUMENT" [selected]="newEntryType === 'DOCUMENT'">DOCUMENT</ui5-option>
+        </ui5-select>
+        <ui5-label>{{ 'common.linkUrl' | translate }}</ui5-label>
+        <ui5-input [value]="newEntryLinkUrl" (input)="newEntryLinkUrl = $any($event.target).value"></ui5-input>
+      }
+    }
+  </div>
+  <div slot="footer" class="flex justify-end gap-3 lg:gap-2 p-3 lg:p-2">
+    <ui5-button design="Transparent" (click)="closeAddDialog()">{{ 'common.cancel' | translate }}</ui5-button>
+    @if (addMode() === 'new') {
+      <ui5-button design="Emphasized" [disabled]="adding()" (click)="submitNewEntry()">{{ 'common.createAndAdd' | translate }}</ui5-button>
+    }
+  </div>
+</ui5-dialog>

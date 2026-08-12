@@ -1,0 +1,143 @@
+<ui5-flexible-column-layout class="block h-[calc(100vh-3rem)]" [layout]="fclLayout()">
+  <div slot="startColumn" class="p-6 lg:p-5 h-full overflow-auto">
+    <div class="flex items-center justify-between mb-5 lg:mb-4">
+      <ui5-title level="H2">{{ 'sipoc.termPlural' | translate }}</ui5-title>
+      <div class="flex items-center gap-2">
+        <ui5-button icon="download" [disabled]="exportingAll()" (click)="exportAll()">{{ 'sipoc.exportAll' | translate }}</ui5-button>
+        <ui5-button design="Emphasized" icon="add" (click)="openCreateDialog()">{{ 'common.new' | translate }}</ui5-button>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3 lg:gap-2 mb-5 lg:mb-4">
+      <ui5-input
+        class="w-64"
+        [placeholder]="'sipoc.searchPlaceholder' | translate"
+        show-clear-icon
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)"
+      >
+        <ui5-icon slot="icon" name="search"></ui5-icon>
+      </ui5-input>
+
+      <span class="text-sm text-gray-500 ml-2">{{ 'common.sortBy' | translate }}</span>
+      <ui5-button [design]="sortField() === 'name' ? 'Emphasized' : 'Transparent'" (click)="setSortField('name')">
+        {{ 'common.name' | translate }}
+      </ui5-button>
+      <ui5-button [design]="sortField() === 'createdAt' ? 'Emphasized' : 'Transparent'" (click)="setSortField('createdAt')">
+        {{ 'sipoc.sortCreated' | translate }}
+      </ui5-button>
+      <ui5-button
+        design="Transparent"
+        [icon]="sortDirection() === 'asc' ? 'sort-ascending' : 'sort-descending'"
+        (click)="toggleSortDirection()"
+        [title]="'common.toggleSortDirection' | translate"
+      ></ui5-button>
+    </div>
+
+    @if (error()) {
+      <ui5-message-strip design="Negative" class="block mb-5 lg:mb-4">{{ error() }}</ui5-message-strip>
+    }
+
+    <ui5-table class="w-full" row-action-count="1" (row-click)="openDetail($any($event).detail.row.rowKey)">
+      <ui5-table-header-row slot="headerRow">
+        <ui5-table-header-cell><span class="block pl-4 lg:pl-3">{{ 'common.name' | translate }}</span></ui5-table-header-cell>
+        <ui5-table-header-cell><span class="block pl-4 lg:pl-3">{{ 'common.description' | translate }}</span></ui5-table-header-cell>
+        @if (showCreatedColumn()) {
+          <ui5-table-header-cell width="180px"><span class="block pl-4 lg:pl-3">{{ 'sipoc.columnCreated' | translate }}</span></ui5-table-header-cell>
+        }
+        <ui5-table-header-cell width="140px"><span class="block pl-4 lg:pl-3">{{ 'common.actions' | translate }}</span></ui5-table-header-cell>
+      </ui5-table-header-row>
+
+      @for (sipoc of sortedSipocs(); track sipoc.id) {
+        <ui5-table-row [rowKey]="sipoc.id" interactive>
+          <ui5-table-cell><span class="block whitespace-normal break-words pl-4 lg:pl-3">{{ sipoc.name }}</span></ui5-table-cell>
+          <ui5-table-cell><span class="block whitespace-normal break-words pl-4 lg:pl-3">{{ sipoc.description || '—' }}</span></ui5-table-cell>
+          @if (showCreatedColumn()) {
+            <ui5-table-cell><span class="block pl-4 lg:pl-3">{{ sipoc.createdAt | date: createdAtFormat() }}</span></ui5-table-cell>
+          }
+          <ui5-table-cell>
+            @if (showActionsDropdown()) {
+              <ui5-button
+                design="Transparent"
+                icon="overflow"
+                [tooltip]="'common.actions' | translate"
+                (click)="openRowMenu(sipoc, $event)"
+              ></ui5-button>
+            } @else {
+              <div class="flex items-center flex-nowrap gap-1">
+                <ui5-button
+                  design="Transparent"
+                  icon="download"
+                  [disabled]="exportingRowId() === sipoc.id"
+                  [tooltip]="'sipoc.export' | translate"
+                  (click)="exportRow(sipoc, $event)"
+                ></ui5-button>
+                <ui5-button design="Transparent" icon="edit" [tooltip]="'common.edit' | translate" (click)="editRow(sipoc, $event)"></ui5-button>
+                <ui5-button
+                  design="Transparent"
+                  icon="delete"
+                  [tooltip]="'common.delete' | translate"
+                  (click)="requestDelete(sipoc, $event)"
+                ></ui5-button>
+              </div>
+            }
+          </ui5-table-cell>
+          <ui5-table-row-action-navigation slot="actions" interactive (click)="openDetail(sipoc.id)"></ui5-table-row-action-navigation>
+        </ui5-table-row>
+      }
+    </ui5-table>
+
+    <ui5-menu
+      [open]="menuOpen()"
+      [opener]="menuOpener()"
+      (item-click)="onRowMenuItemClick($event)"
+      (close)="menuOpen.set(false)"
+    >
+      <ui5-menu-item data-action="export" icon="download" [text]="'sipoc.export' | translate"></ui5-menu-item>
+      <ui5-menu-item data-action="edit" icon="edit" [text]="'common.edit' | translate"></ui5-menu-item>
+      <ui5-menu-item data-action="delete" icon="delete" [text]="'common.delete' | translate"></ui5-menu-item>
+    </ui5-menu>
+
+    @if (!loading() && sortedSipocs().length === 0) {
+      <p class="text-gray-500 mt-4">
+        {{ (sipocs().length === 0 ? 'sipoc.emptyNone' : 'sipoc.emptyFiltered') | translate }}
+      </p>
+    }
+  </div>
+
+  @if (selectedId()) {
+    <app-sipoc-detail
+      slot="midColumn"
+      class="block h-full"
+      [id]="selectedId()!"
+      [fullScreen]="effectiveDetailFullScreen()"
+      [startInEdit]="editOnOpenId() === selectedId()"
+      (closed)="closeDetail()"
+      (deleted)="onDetailDeleted()"
+      (fullScreenToggled)="toggleDetailFullScreen()"
+    ></app-sipoc-detail>
+  }
+</ui5-flexible-column-layout>
+
+<ui5-dialog [open]="createDialogOpen()" [headerText]="'sipoc.newDialogTitle' | translate">
+  <div class="p-5 lg:p-4 flex flex-col gap-4 lg:gap-3 min-w-[24rem]">
+    <ui5-label>{{ 'common.name' | translate }}</ui5-label>
+    <ui5-input [value]="newName" (input)="newName = $any($event.target).value"></ui5-input>
+    <ui5-label>{{ 'common.description' | translate }}</ui5-label>
+    <ui5-textarea [value]="newDescription" (input)="newDescription = $any($event.target).value" rows="3"></ui5-textarea>
+  </div>
+  <div slot="footer" class="flex justify-end gap-3 lg:gap-2 p-3 lg:p-2">
+    <ui5-button design="Transparent" (click)="closeCreateDialog()">{{ 'common.cancel' | translate }}</ui5-button>
+    <ui5-button design="Emphasized" (click)="submitCreate()">{{ 'common.create' | translate }}</ui5-button>
+  </div>
+</ui5-dialog>
+
+<ui5-dialog [open]="!!deleteCandidate()" [headerText]="'sipoc.deleteDialogTitle' | translate">
+  <div class="p-5 lg:p-4 min-w-[20rem]">
+    <ui5-text>{{ 'sipoc.deleteConfirm' | translate: { name: deleteCandidate()?.name } }}</ui5-text>
+  </div>
+  <div slot="footer" class="flex justify-end gap-3 lg:gap-2 p-3 lg:p-2">
+    <ui5-button design="Transparent" (click)="cancelDelete()">{{ 'common.cancel' | translate }}</ui5-button>
+    <ui5-button design="Negative" (click)="confirmDelete()">{{ 'common.delete' | translate }}</ui5-button>
+  </div>
+</ui5-dialog>

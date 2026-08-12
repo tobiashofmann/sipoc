@@ -1,9 +1,0 @@
-key,parentKey,name,category,description,type,importance,criticality
-vertrag,,Vertrag,Stammdaten,Vertragsobjekte,VIRTUAL,HIGH,INTERNAL
-einkaufsvertrag,vertrag,Einkaufsvertrag,Vertrag,Vertrag für Einkauf,VIRTUAL,HIGH,INTERNAL
-verkaufsvertrag,vertrag,Verkaufsvertrag,Vertrag,Vertrag für Verkauf,VIRTUAL,MEDIUM,INTERNAL
-bestellvertrag,vertrag,Bestellvertrag,Vertrag,Vertrag für Bestellungen,VIRTUAL,MEDIUM,INTERNAL
-bom,,BOM,Stammdaten,Bill of Materials / Stücklisten,VIRTUAL,MEDIUM,PUBLIC
-materialbom,bom,Materialbom,BOM,Materialbezogene BOM,VIRTUAL,MEDIUM,PUBLIC
-dokumentenbom,bom,Dokumentenbom,BOM,Dokumentenbezogene BOM,VIRTUAL,LOW,PUBLIC
-stueckliste,bom,Stückliste,BOM,Stückliste,VIRTUAL,LOW,PUBLIC

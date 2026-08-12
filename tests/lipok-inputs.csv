@@ -1,4 +1,0 @@
-lipokKey,inputKey,position,supplierKey,processStepKey
-beschaffungsprozess,bestellanforderung,0,abteilung-einkauf,bedarf-ermitteln
-beschaffungsprozess,lieferschein,1,lieferant-a,wareneingang-pruefen
-beschaffungsprozess,rechnung,2,lieferant-a,rechnung-pruefen

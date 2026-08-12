@@ -1,7 +1,0 @@
-key,name,description
-kunde-1,Kunde 1,Einzelkunde
-kunde-2,Kunde 2,Key Account
-lieferant-a,Lieferant A,Externer Lieferant
-lieferant-b,Lieferant B,Interner Lieferant
-lieferant-c,Lieferant C,Rahmenvertragspartner
-abteilung-einkauf,Abteilung Einkauf,Interne Einkaufsabteilung – im Beschaffungsprozess sowohl Lieferant (der Bestellanforderung) als auch Kunde (der Bestellbestätigung)

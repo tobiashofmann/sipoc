@@ -1,4 +1,0 @@
-key,name,description,type,linkUrl
-bestellbestaetigung,Bestellbestätigung,Bestätigung der Bestellung durch den Lieferanten,DOCUMENT,
-wareneingangsbestaetigung,Wareneingangsbestätigung,Bestätigung des kontrollierten Wareneingangs,DOCUMENT,
-zahlungsavis,Zahlungsavis,Avis über die ausgeführte Zahlung,DOCUMENT,

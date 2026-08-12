@@ -1,0 +1,5 @@
+lipokKey,outputKey,customerKey
+beschaffungsprozess,bestellbestaetigung,kunde-1
+beschaffungsprozess,bestellbestaetigung,abteilung-einkauf
+beschaffungsprozess,wareneingangsbestaetigung,kunde-1
+beschaffungsprozess,zahlungsavis,kunde-2

@@ -1,0 +1,4 @@
+key,name,description,type,linkUrl
+bestellanforderung,Bestellanforderung,Interne Anforderung zur Beschaffung eines Bedarfs,DOCUMENT,
+lieferschein,Lieferschein,Begleitdokument der Warenlieferung,DOCUMENT,
+rechnung,Rechnung,Rechnung des Lieferanten für die gelieferte Ware,DOCUMENT,

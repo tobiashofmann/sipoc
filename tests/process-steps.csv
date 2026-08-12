@@ -1,0 +1,6 @@
+key,name,description
+bedarf-ermitteln,Bedarf ermitteln,Fachbereich stellt den Beschaffungsbedarf fest
+bestellung-erstellen,Bestellung erstellen,Einkauf erstellt und versendet die Bestellung
+wareneingang-pruefen,Wareneingang prüfen,Wareneingang kontrolliert Menge und Qualität der Lieferung
+rechnung-pruefen,Rechnung prüfen,Buchhaltung gleicht Rechnung mit Bestellung und Wareneingang ab
+zahlung-freigeben,Zahlung freigeben,Buchhaltung gibt die Zahlung an den Lieferanten frei

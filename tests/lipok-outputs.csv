@@ -1,0 +1,4 @@
+lipokKey,outputKey,position,processStepKey
+beschaffungsprozess,bestellbestaetigung,0,bestellung-erstellen
+beschaffungsprozess,wareneingangsbestaetigung,1,wareneingang-pruefen
+beschaffungsprozess,zahlungsavis,2,zahlung-freigeben

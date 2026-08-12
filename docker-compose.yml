@@ -1,0 +1,68 @@
+# Database selection: h2 (default) | mysql | postgresql — see the root README.md's "Backend"
+# section. One variable, COMPOSE_PROFILES, switches both which Spring profile the backend
+# activates and which optional database container starts
+# (Docker Compose's own "profiles" feature — a service tagged `profiles: [...]` only starts when
+# that name is listed in COMPOSE_PROFILES or passed via `--profile`):
+#
+#   docker compose up --build                               # H2 in-memory, no extra services
+#   COMPOSE_PROFILES=mysql docker compose up --build         # + mysql container
+#   COMPOSE_PROFILES=postgresql docker compose up --build    # + postgresql container
+#
+# DB_NAME/DB_USERNAME/DB_PASSWORD (below) seed both the backend's datasource and the mysql/
+# postgresql containers' own root database, so they line up automatically.
+#
+# SECURITY: the sipoc/sipoc + root/root fallbacks below are throwaway local-dev defaults, good
+# enough for a database that's only reachable from other containers on this compose network (note
+# neither mysql nor postgresql publishes a host port, deliberately, and the backend itself has no
+# authentication at all — see CLAUDE.md/SCHEMA.md). Always override DB_USERNAME/DB_PASSWORD/
+# DB_ROOT_PASSWORD (e.g. via a git-ignored .env file) before running this anywhere reachable from
+# an untrusted network.
+services:
+  backend:
+    build: ./backend/server
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${COMPOSE_PROFILES:-h2}
+      DB_NAME: ${DB_NAME:-lipokdb}
+      DB_USERNAME: ${DB_USERNAME:-sipoc}
+      DB_PASSWORD: ${DB_PASSWORD:-sipoc}
+    restart: on-failure:5 # a couple of retries in case mysql/postgresql is still starting up
+
+  frontend:
+    build: ./frontend/sipoc-ui
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+  mysql:
+    image: mysql:8.4
+    profiles: ["mysql"]
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-lipokdb}
+      MYSQL_USER: ${DB_USERNAME:-sipoc}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-sipoc}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    # No host port published on purpose (see SECURITY note above) — the backend reaches this
+    # container over the compose network at mysql:3306. Add `ports: ["3306:3306"]` locally, with
+    # non-default credentials, if you need a DB client on the host to connect directly.
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  postgresql:
+    image: postgres:16
+    profiles: ["postgresql"]
+    environment:
+      POSTGRES_DB: ${DB_NAME:-lipokdb}
+      POSTGRES_USER: ${DB_USERNAME:-sipoc}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-sipoc}
+    # No host port published on purpose (see SECURITY note above) — the backend reaches this
+    # container over the compose network at postgresql:5432. Add `ports: ["5432:5432"]` locally,
+    # with non-default credentials, if you need a DB client on the host to connect directly.
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+
+volumes:
+  mysql-data:
+  postgresql-data:

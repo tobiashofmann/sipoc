@@ -1,0 +1,6 @@
+lipokKey,processStepKey,position,predecessorKey
+beschaffungsprozess,bedarf-ermitteln,0,
+beschaffungsprozess,bestellung-erstellen,1,bedarf-ermitteln
+beschaffungsprozess,wareneingang-pruefen,2,bestellung-erstellen
+beschaffungsprozess,rechnung-pruefen,3,wareneingang-pruefen
+beschaffungsprozess,zahlung-freigeben,4,rechnung-pruefen

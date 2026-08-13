@@ -74,10 +74,12 @@ SIPOC for the procure-to-pay process
 
 > (requires Java 26 and Node.js/npm to already be installed, see below)
 
-Run sipoc.[sh/cmd] start to start the app. This starts the frontend and backend using H2 as database.
+Run sipoc.[sh/cmd] start to start the app. This starts the frontend and backend using H2 as database. Ensure that the scripts are executable (Mac/Linux: chmod u+x).
 
 - Frontend: [http://localhost:4200](http://localhost:4200)
 - Backend: Swagger UI at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+
+> Note: The script will seed mock data in German.
 
 ### macOS
 
@@ -89,6 +91,12 @@ Run sipoc.[sh/cmd] start to start the app. This starts the frontend and backend 
 ./sipoc.sh stop    # stop backend + frontend
 ```
 
+To seed the mock data in English:
+
+```sh
+SIPOC_LANG=EN ./sipoc.sh start
+```
+
 ### Windows
 
 The Windows wrapper uses the same subcommand structure as the Unix script:
@@ -97,6 +105,12 @@ The Windows wrapper uses the same subcommand structure as the Unix script:
 sipoc.bat start   # start backend + frontend, wait until both are up, seed mock data
 sipoc.bat status  # check what's currently running
 sipoc.bat stop    # stop backend + frontend
+```
+
+To seed the mock data in English:
+
+```sh
+set SIPOC_LANG=EN && sipoc.bat start
 ```
 
 If the project folder is on your `PATH`, you can also call it as `sipoc start` / `sipoc status` / `sipoc stop`. In PowerShell, the equivalent is usually `./sipoc.bat start` or `./sipoc.ps1 start`.

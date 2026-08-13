@@ -3,6 +3,8 @@ param(
     [Parameter(Position = 0)]
     [ValidateSet("start", "stop", "status")]
     [string]$Action = ""
+    ,
+    [switch]$NoSeed
 )
 
 $ErrorActionPreference = "Stop"
@@ -211,12 +213,23 @@ function Invoke-Start {
     New-Item -ItemType Directory -Force -Path $RUN_DIR | Out-Null
     $seededBackend = $false
 
+    # Honor -NoSeed switch or environment variables SIPOC_SKIP_SEED / SKIP_SEED
+    $skipSeed = $false
+    if ($env:SIPOC_SKIP_SEED -and $env:SIPOC_SKIP_SEED -match '^(1|true)$') { $skipSeed = $true }
+    if ($env:SKIP_SEED -and $env:SKIP_SEED -match '^(1|true)$') { $skipSeed = $true }
+    if ($NoSeed) { $skipSeed = $true }
+
     if (-not (Start-Backend)) {
         exit 1
     }
 
     $seededBackend = $true
-    Seed-MockData
+    if (-not $skipSeed) {
+        Seed-MockData
+    }
+    else {
+        Write-Host "Skipping mock data seeding (disabled by -NoSeed or env)"
+    }
 
     if (-not (Start-Frontend)) {
         exit 1
@@ -257,7 +270,7 @@ switch ($Action) {
     "stop" { Invoke-Stop }
     "status" { Invoke-Status }
     default {
-        Write-Host "Usage: powershell -File .\sipoc.ps1 {start|stop|status}"
+        Write-Host "Usage: powershell -File .\sipoc.ps1 {start|stop|status} [-NoSeed]"
         exit 1
     }
 }

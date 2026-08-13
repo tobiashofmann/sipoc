@@ -24,6 +24,17 @@ FRONTEND_URL="http://localhost:$FRONTEND_PORT"
 BACKEND_LOG="$RUN_DIR/backend.log"
 FRONTEND_LOG="$RUN_DIR/frontend.log"
 
+# Allow disabling mock-data seeding via env or CLI flag --no-seed
+NO_SEED=""
+for _arg in "$@"; do
+  if [ "$_arg" = "--no-seed" ] || [ "$_arg" = "--no_seed" ]; then
+    NO_SEED=1
+  fi
+done
+if [ "${SIPOC_SKIP_SEED:-}" = "1" ] || [ "${SIPOC_SKIP_SEED:-}" = "true" ] || [ "${SKIP_SEED:-}" = "1" ]; then
+  NO_SEED=1
+fi
+
 pid_on_port() {
   lsof -nP -iTCP:"$1" -sTCP:LISTEN -t 2>/dev/null | head -1
 }
@@ -107,10 +118,14 @@ cmd_start() {
   mkdir -p "$RUN_DIR"
   SEEDED_BACKEND=0
   start_backend || exit 1
-  if [ "$SEEDED_BACKEND" = "1" ]; then
+  if [ "$SEEDED_BACKEND" = "1" ] && [ -z "$NO_SEED" ]; then
     seed_mock_data
   else
-    echo "Skipping mock data seeding (backend was already running)"
+    if [ -n "$NO_SEED" ]; then
+      echo "Skipping mock data seeding (disabled by --no-seed or env)"
+    else
+      echo "Skipping mock data seeding (backend was already running)"
+    fi
   fi
   start_frontend || exit 1
   echo
@@ -165,7 +180,7 @@ case "${1:-}" in
   stop) cmd_stop ;;
   status) cmd_status ;;
   *)
-    echo "Usage: $0 {start|stop|status}" >&2
+    echo "Usage: $0 {start|stop|status} [--no-seed]" >&2
     exit 1
     ;;
 esac

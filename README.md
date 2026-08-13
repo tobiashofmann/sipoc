@@ -15,16 +15,13 @@ An application for managing SIPOC diagrams (**S**upplier, **I**nput, **P**rocess
 **C**ustomer) — a process-improvement/business-analysis tool. Also called "LIPOK" in the project
 (German: Lieferant, Input, Prozess, Output, Kunde).
 
-📄 **[Project overview / GitHub Pages](https://tobias-a-hofmann.github.io/sipocs/)**
+📄 **[Project overview / GitHub Pages](https://tobiashofmann.github.io/sipoc/)**
 
 ## Screenshots
 
 | | | | | |
 | --- | --- | --- | --- | --- |
 | [![Screenshot 1 thumbnail](images/thumbs/screenshot-1.png)](images/screenshot-1.png) | [![Screenshot 2 thumbnail](images/thumbs/screenshot-2.png)](images/screenshot-2.png) | [![Screenshot 3 thumbnail](images/thumbs/screenshot-3.png)](images/screenshot-3.png) | [![Screenshot 4 thumbnail](images/thumbs/screenshot-4.png)](images/screenshot-4.png) | [![Screenshot 5 thumbnail](images/thumbs/screenshot-5.png)](images/screenshot-5.png) |
-
-*Placeholders — click a thumbnail to open the full-size image; replace the files in
-[`images/`](images/) and [`images/thumbs/`](images/thumbs/) with real screenshots.*
 
 ## Example SIPOC
 

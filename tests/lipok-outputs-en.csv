@@ -1,0 +1,4 @@
+lipokKey,outputKey,position,processStepKey
+procure-to-pay-process,order-confirmation,0,create-order
+procure-to-pay-process,goods-receipt-confirmation,1,check-goods-receipt
+procure-to-pay-process,payment-advice,2,release-payment

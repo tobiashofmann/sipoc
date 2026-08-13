@@ -1,0 +1,4 @@
+key,name,description,type,linkUrl
+purchase-requisition,Purchase Requisition,Internal request to procure an item,DOCUMENT,
+delivery-note,Delivery Note,Accompanying document for goods delivery,DOCUMENT,
+invoice,Invoice,Supplier invoice for delivered goods,DOCUMENT,

@@ -1,0 +1,6 @@
+lipokKey,processStepKey,position,predecessorKey
+procure-to-pay-process,determine-requirement,0,
+procure-to-pay-process,create-order,1,determine-requirement
+procure-to-pay-process,check-goods-receipt,2,create-order
+procure-to-pay-process,check-invoice,3,check-goods-receipt
+procure-to-pay-process,release-payment,4,check-invoice

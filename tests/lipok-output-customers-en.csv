@@ -1,0 +1,5 @@
+lipokKey,outputKey,customerKey
+procure-to-pay-process,order-confirmation,customer-1
+procure-to-pay-process,order-confirmation,purchasing-department
+procure-to-pay-process,goods-receipt-confirmation,customer-1
+procure-to-pay-process,payment-advice,customer-2

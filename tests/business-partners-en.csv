@@ -1,0 +1,7 @@
+key,name,description
+customer-1,Customer 1,Individual customer
+customer-2,Customer 2,Key account
+supplier-a,Supplier A,External supplier
+supplier-b,Supplier B,Internal supplier
+supplier-c,Supplier C,Framework agreement partner
+purchasing-department,Purchasing Department,Internal purchasing department — acts both as supplier (purchase requisition) and customer (order confirmation) in the procurement process

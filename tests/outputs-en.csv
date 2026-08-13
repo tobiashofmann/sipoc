@@ -1,0 +1,4 @@
+key,name,description,type,linkUrl
+order-confirmation,Order Confirmation,Confirmation of the order by the supplier,DOCUMENT,
+goods-receipt-confirmation,Goods Receipt Confirmation,Confirmation of inspected goods receipt,DOCUMENT,
+payment-advice,Payment Advice,Advice about the executed payment,DOCUMENT,

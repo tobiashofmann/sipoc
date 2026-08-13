@@ -1,0 +1,9 @@
+key,parentKey,name,category,description,type,importance,criticality
+contract,,Contract,Master Data,Contractual objects,VIRTUAL,HIGH,INTERNAL
+purchase-contract,contract,Purchase Contract,Contract,Contract for purchasing,VIRTUAL,HIGH,INTERNAL
+sales-contract,contract,Sales Contract,Contract,Contract for sales,VIRTUAL,MEDIUM,INTERNAL
+order-contract,contract,Order Contract,Contract,Contract for orders,VIRTUAL,MEDIUM,INTERNAL
+bom,,BOM,Master Data,Bill of Materials / parts lists,VIRTUAL,MEDIUM,PUBLIC
+material-bom,bom,Material BOM,BOM,Material-related BOM,VIRTUAL,MEDIUM,PUBLIC
+document-bom,bom,Document BOM,BOM,Document-related BOM,VIRTUAL,LOW,PUBLIC
+parts-list,bom,Parts List,BOM,Parts list,VIRTUAL,LOW,PUBLIC

@@ -1,0 +1,4 @@
+lipokKey,inputKey,position,supplierKey,processStepKey
+procure-to-pay-process,purchase-requisition,0,purchasing-department,determine-requirement
+procure-to-pay-process,delivery-note,1,supplier-a,check-goods-receipt
+procure-to-pay-process,invoice,2,supplier-a,check-invoice

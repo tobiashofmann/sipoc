@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { existsSync } from "node:fs";
 import { parseCsv } from "./csv.ts";
 
 const BASE_URL = process.env.SIPOC_BASE_URL ?? "http://localhost:8080";
@@ -38,7 +39,28 @@ async function patchJson(path: string, body: unknown): Promise<any> {
 }
 
 function csv(name: string): Record<string, string>[] {
-  return parseCsv(join(DIR, `${name}.csv`));
+  const lang = getLanguage();
+  const suffix = lang && lang.toLowerCase() !== "de" ? `-${lang.toLowerCase()}` : "";
+  const candidate = join(DIR, `${name}${suffix}.csv`);
+  if (suffix && existsSync(candidate)) {
+    console.log(`Using mock file: ${name}${suffix}.csv (lang=${lang.toUpperCase()})`);
+    return parseCsv(candidate);
+  }
+  // Fallback to default (German) file
+  const fallback = join(DIR, `${name}.csv`);
+  console.log(`Using mock file: ${name}.csv (default)`);
+  return parseCsv(fallback);
+}
+
+function getLanguage(): string {
+  // Priority: CLI --lang=, positional first arg, environment SIPOC_LANG, default 'de'
+  const env = process.env.SIPOC_LANG;
+  if (env && env.trim() !== "") return env.trim();
+  const arg = process.argv.slice(2).find((a) => a.startsWith("--lang="));
+  if (arg) return arg.split("=")[1];
+  const pos = process.argv[2];
+  if (pos && /^[A-Za-z]{2}$/.test(pos)) return pos;
+  return "de";
 }
 
 function orNull(value: string | undefined): string | null {

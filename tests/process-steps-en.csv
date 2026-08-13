@@ -1,0 +1,6 @@
+key,name,description
+determine-requirement,Determine Requirement,Business unit determines procurement requirement
+create-order,Create Order,Procurement creates and sends the order
+check-goods-receipt,Check Goods Receipt,Incoming goods are checked for quantity and quality
+check-invoice,Check Invoice,Accounting reconciles invoice with order and goods receipt
+release-payment,Release Payment,Accounting releases payment to the supplier

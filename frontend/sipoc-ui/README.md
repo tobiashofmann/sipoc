@@ -8,7 +8,7 @@ as the widget library, Tailwind CSS for layout, `@ngx-translate` for i18n. See t
 
 ## Requirements
 
-- Node.js 20+ and npm
+- Node.js 24+ and npm
 
 ## Running it
 

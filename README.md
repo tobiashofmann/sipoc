@@ -151,6 +151,52 @@ With that `.env` in place, a plain `docker compose up --build` picks it up autom
 container's own credentials, so they stay in sync — see `docker-compose.yml` for the full list of
 variables (including `DB_ROOT_PASSWORD` for MySQL's root user).
 
+### Where the database files live (volume vs. host directory)
+
+Only the MySQL and PostgreSQL containers persist data (H2 is in-memory, so there is no file to
+map). By default `docker-compose.yml` stores the database files in a **named Docker volume** that
+Docker manages itself:
+
+| Database | Volume | Path inside the container |
+| --- | --- | --- |
+| MySQL | `mysql-data` | `/var/lib/mysql` |
+| PostgreSQL | `postgresql-data` | `/var/lib/postgresql/data` |
+
+Compose prefixes the volume name with the project (folder) name, so it shows up as e.g.
+`sipoc_mysql-data` in `docker volume ls`. `docker volume inspect sipoc_mysql-data` shows where
+Docker keeps it. This is the simplest option and works the same on every OS.
+
+To keep the files in a **directory on the Docker host** instead (easy to back up, inspect, or
+move), use a bind mount. Don't edit `docker-compose.yml`; create a `docker-compose.override.yml`
+next to it, which Compose merges in automatically (the entry with the same container path replaces
+the named volume):
+
+```yaml
+# docker-compose.override.yml
+services:
+  mysql:
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+  postgresql:
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data
+```
+
+Then start as usual, e.g. `COMPOSE_PROFILES=postgresql docker compose up --build`; the database
+files appear in `./data/postgresql/` on the host. Use an absolute path (e.g.
+`/srv/sipoc/postgresql:/var/lib/postgresql/data`) to put them anywhere else.
+
+- Only override the service you use. The named volumes can stay declared in `docker-compose.yml`;
+  unused ones are harmless.
+- On Linux the host directory must be writable by the container's database user (UID `999` for the
+  official `mysql` and `postgres` images), e.g. `sudo chown -R 999:999 data/postgresql`. Docker
+  Desktop on macOS/Windows handles this for you.
+- Add `data/` to `.gitignore` so database files are not committed.
+- `docker compose down -v` only deletes named volumes. A bind-mounted directory is never touched,
+  so delete the directory yourself to start from an empty database.
+- Don't copy the files of a running database; stop the stack first (`docker compose down`) or use
+  the database's own dump tool.
+
 > **Security note:** the built-in `sipoc`/`sipoc` (and MySQL `root`/`root`) fallbacks are
 > throwaway local-dev defaults. Neither the `mysql` nor `postgresql` container publishes a host
 > port by default, so they're only reachable from other containers on the same Compose network —

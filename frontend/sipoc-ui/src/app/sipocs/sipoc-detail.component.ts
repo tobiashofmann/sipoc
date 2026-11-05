@@ -12,6 +12,7 @@ import {
   ViewChild,
   computed,
   signal,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -86,6 +87,7 @@ function connectorPath(x1: number, y1: number, x2: number, y2: number, axis: 'ho
   standalone: true,
   imports: [CommonModule, FormsModule, TranslatePipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './sipoc-detail.component.html',
 })
 export class SipocDetailComponent implements OnChanges, OnDestroy {

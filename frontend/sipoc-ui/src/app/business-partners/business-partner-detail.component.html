@@ -100,7 +100,7 @@
 
 <ui5-dialog [open]="deleteDialogOpen()" [headerText]="'businessPartners.deleteDialogTitle' | translate">
   <div class="p-5 lg:p-4 min-w-[20rem]">
-    <ui5-text>{{ 'businessPartners.deleteConfirm' | translate: { name: partner()?.name } }}</ui5-text>
+    <ui5-text>{{ 'businessPartners.deleteConfirm' | translate: { name: $safeNavigationMigration(partner()?.name) } }}</ui5-text>
   </div>
   <div slot="footer" class="flex justify-end gap-3 lg:gap-2 p-3 lg:p-2">
     <ui5-button design="Transparent" (click)="cancelDelete()">{{ 'common.cancel' | translate }}</ui5-button>

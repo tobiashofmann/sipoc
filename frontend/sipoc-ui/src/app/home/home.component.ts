@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component, OnInit, signal } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -9,6 +9,7 @@ import { HomeStatsService } from './home-stats.service';
   standalone: true,
   imports: [TranslatePipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './home.component.html',
 })
 /** Dashboard landing page: summary counts plus shortcuts into the three feature areas. */

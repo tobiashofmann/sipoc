@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { CUSTOM_ELEMENTS_SCHEMA, Component, ElementRef, OnInit, ViewChild, computed, signal } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, Component, ElementRef, OnInit, ViewChild, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -22,6 +22,7 @@ interface PartnerGroup {
   standalone: true,
   imports: [CommonModule, FormsModule, BusinessPartnerDetailComponent, TranslatePipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './business-partner-list.component.html',
 })
 /** Master list of business partners, with search/sort/grouping and an embedded detail panel. */

@@ -8,7 +8,7 @@ over HTTP. See the root [`README.md`](../../README.md) for the project as a whol
 
 ## Requirements
 
-- Java 26 (`brew install openjdk@26` on macOS if you don't have it)
+- Java 25 (`brew install openjdk@25` on macOS if you don't have it)
 - No local Maven install needed â€” use the bundled wrapper (`./mvnw`)
 
 ## Running it

@@ -57,13 +57,13 @@ resolve_java_home() {
   fi
   if command -v brew >/dev/null 2>&1; then
     local brew_java
-    brew_java="$(brew --prefix openjdk@26 2>/dev/null)"
+    brew_java="$(brew --prefix openjdk@25 2>/dev/null)"
     if [ -n "$brew_java" ] && [ -x "$brew_java/bin/java" ]; then
       export JAVA_HOME="$brew_java"
       return 0
     fi
   fi
-  echo "Could not find a Java 26 runtime. Install it with: brew install openjdk@26" >&2
+  echo "Could not find a Java 25 runtime. Install it with: brew install openjdk@25" >&2
   return 1
 }
 

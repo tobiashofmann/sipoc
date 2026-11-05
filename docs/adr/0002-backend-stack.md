@@ -13,7 +13,7 @@ API documentation, without hand-rolling any of it.
 
 ## Decision
 
-Build the backend as a Spring Boot 4 application (Java 26) using Spring Web for REST controllers,
+Build the backend as a Spring Boot 4 application (Java 25) using Spring Web for REST controllers,
 Spring Data JPA for persistence, and Maven (via the Maven wrapper, `mvnw`) as the build tool.
 `springdoc-openapi` generates the OpenAPI spec and Swagger UI directly from the controllers/DTOs,
 so API docs stay in sync with the code without a separate spec-authoring step.

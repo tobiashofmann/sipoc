@@ -69,9 +69,9 @@ SIPOC for the procure-to-pay process
 
 ## Quick start
 
-> (requires Java 26 and Node.js/npm to already be installed, see below)
+> (requires Java 25 and Node.js/npm to already be installed, see below)
 
-Run sipoc.[sh/cmd] start to start the app. This starts the frontend and backend using H2 as database. Ensure that the scripts are executable (Mac/Linux: chmod u+x).
+Run `sipoc.[sh/cmd] start` to start the app. This starts the frontend and backend using H2 as database. Ensure that the scripts are executable (Mac/Linux: chmod u+x).
 
 - Frontend: [http://localhost:4200](http://localhost:4200)
 - Backend: Swagger UI at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
@@ -194,7 +194,7 @@ flowchart LR
 See [`backend/server/README.md`](backend/server/README.md) for the full reference — standalone
 Docker build/run, generating Javadoc, running a single test, loading mock data directly, etc.
 
-Java 26, Spring Boot 4.1.0, Spring Data JPA. Schema is always derived from the entities (no
+Java 5, Spring Boot 4.1.0, Spring Data JPA. Schema is always derived from the entities (no
 migration files) — `spring.jpa.hibernate.ddl-auto=update` on every profile. API docs are generated
 via springdoc-openapi.
 
@@ -223,10 +223,10 @@ SPRING_PROFILES_ACTIVE=postgresql DB_HOST=localhost DB_PASSWORD=... ./mvnw sprin
   [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
   (OpenAPI JSON at `/v3/api-docs`).
 
-Run it locally with the default H2 database (requires Java 26, see `backend/server/pom.xml`):
+Run it locally with the default H2 database (requires Java 25, see `backend/server/pom.xml`):
 
 ```sh
-brew install openjdk@26   # if not already installed
+brew install openjdk@25   # if not already installed
 cd backend/server
 ./mvnw spring-boot:run
 ```

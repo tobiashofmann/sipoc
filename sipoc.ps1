@@ -95,7 +95,7 @@ function Resolve-JavaHome {
 
         foreach ($candidate in Get-ChildItem -Path $root -Directory -ErrorAction SilentlyContinue) {
             $name = $candidate.Name.ToLowerInvariant()
-            if ($name -match 'jdk-?26|openjdk-?26|jdk26|jdk-?27|openjdk-?27|jdk27|latest') {
+            if ($name -match 'jdk-?25|openjdk-?25|jdk25|jdk-?26|openjdk-?26|jdk26|latest') {
                 $javaExe = Join-Path $candidate.FullName "bin\java.exe"
                 if (Test-Path $javaExe) {
                     $env:JAVA_HOME = $candidate.FullName
@@ -105,7 +105,7 @@ function Resolve-JavaHome {
         }
     }
 
-    Write-Error "Could not find a Java 26 runtime. Install JDK 26 and set JAVA_HOME."
+    Write-Error "Could not find a Java 25 runtime. Install JDK 25 and set JAVA_HOME."
     return $false
 }
 

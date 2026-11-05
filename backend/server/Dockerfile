@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM eclipse-temurin:26-jdk AS build
+FROM eclipse-temurin:25-jdk AS build
 WORKDIR /build
 
 COPY mvnw .
@@ -11,7 +11,7 @@ RUN ./mvnw -B dependency:go-offline
 COPY src src
 RUN ./mvnw -B package -DskipTests
 
-FROM eclipse-temurin:26-jre AS run
+FROM eclipse-temurin:25-jre AS run
 WORKDIR /app
 COPY --from=build /build/target/*.jar app.jar
 

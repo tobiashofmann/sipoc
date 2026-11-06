@@ -1,0 +1,159 @@
+# Copyright 2026 Tobias Hofmann
+# SPDX-License-Identifier: Apache-2.0
+
+name: CI
+
+# Lints, tests and measures code coverage for all three components.
+# Coverage is uploaded to GitHub Code Quality as Cobertura XML (needs `code-quality: write`).
+# Runs on pushes to main (coverage baseline) and on pull requests (comparison against the baseline).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  code-quality: write
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Skip uploads for fork PRs: they have no write access.
+env:
+  CAN_UPLOAD: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+
+jobs:
+  backend:
+    name: Backend (lint, test, coverage)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/server
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Lint (Checkstyle)
+        run: ./mvnw --batch-mode --no-transfer-progress checkstyle:check
+
+      - name: Test with coverage (JUnit + JaCoCo)
+        run: ./mvnw --batch-mode --no-transfer-progress verify
+
+      - name: Convert JaCoCo report to Cobertura
+        run: python3 ../../.github/scripts/jacoco_to_cobertura.py target/site/jacoco/jacoco.xml target/site/jacoco/cobertura.xml --source-root backend/server/src/main/java --repo-root ../..
+
+      - name: Upload coverage report
+        if: ${{ !cancelled() && env.CAN_UPLOAD == 'true' }}
+        uses: actions/upload-code-coverage@v1
+        with:
+          file: backend/server/target/site/jacoco/cobertura.xml
+          language: Java
+          label: code-coverage/backend
+
+      - name: Keep test and coverage reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-reports
+          path: |
+            backend/server/target/surefire-reports
+            backend/server/target/site/jacoco
+          if-no-files-found: ignore
+
+  frontend:
+    name: Frontend (lint, test, coverage)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/sipoc-ui
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/sipoc-ui/package-lock.json
+
+      - run: npm ci
+
+      - name: Lint (angular-eslint)
+        run: npm run lint
+
+      - name: Test with coverage (Karma + Jasmine, headless Chrome)
+        run: npm run test:ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload coverage report
+        if: ${{ !cancelled() && env.CAN_UPLOAD == 'true' }}
+        uses: actions/upload-code-coverage@v1
+        with:
+          file: frontend/sipoc-ui/coverage/cobertura.xml
+          language: TypeScript
+          label: code-coverage/frontend
+
+      - name: Keep coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-reports
+          path: frontend/sipoc-ui/coverage
+          if-no-files-found: ignore
+
+  mcp-server:
+    name: MCP server (lint, test, coverage)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sipoc-mcp-server
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: sipoc-mcp-server/package-lock.json
+
+      - run: npm ci
+
+      - name: Lint (Biome)
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Test with coverage (node:test + c8)
+        run: npm run test:coverage
+
+      - name: Upload coverage report
+        if: ${{ !cancelled() && env.CAN_UPLOAD == 'true' }}
+        uses: actions/upload-code-coverage@v1
+        with:
+          file: sipoc-mcp-server/coverage/cobertura-coverage.xml
+          language: TypeScript
+          label: code-coverage/mcp-server
+
+      - name: Keep coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: mcp-server-reports
+          path: sipoc-mcp-server/coverage
+          if-no-files-found: ignore

@@ -8,7 +8,6 @@ import de.itsfullofstars.sipoc.server.model.Go;
 import de.itsfullofstars.sipoc.server.model.GoCustomProperty;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /** Converts between {@link de.itsfullofstars.sipoc.server.model.Go} (and its custom properties) and its DTOs. */

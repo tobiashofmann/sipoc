@@ -2,7 +2,7 @@
 
 ![Banner image placeholder — replace with docs/banner.png](docs/banner.png)
 
-[![Java](https://img.shields.io/badge/Java-26-ED8B00?logo=openjdk&logoColor=white)](backend/server/pom.xml)
+[![Java](https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white)](backend/server/pom.xml)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.0-6DB33F?logo=spring&logoColor=white)](backend/server/pom.xml)
 [![Angular](https://img.shields.io/badge/Angular-19-DD0031?logo=angular&logoColor=white)](frontend/sipoc-ui/package.json)
 [![SAP UI5 Web Components](https://img.shields.io/badge/SAP%20UI5-Web%20Components-0854A0?logo=sap&logoColor=white)](frontend/sipoc-ui/package.json)
@@ -72,7 +72,7 @@ SIPOC for the procure-to-pay process
 
 ## Quick start
 
-> (requires Java 26 and Node.js/npm to already be installed, see below)
+> (requires Java 25 and Node.js/npm to already be installed, see below)
 
 Run sipoc.[sh/cmd] start to start the app. This starts the frontend and backend using H2 as database.
 
@@ -183,7 +183,7 @@ flowchart LR
 See [`backend/server/README.md`](backend/server/README.md) for the full reference — standalone
 Docker build/run, generating Javadoc, running a single test, loading mock data directly, etc.
 
-Java 26, Spring Boot 4.1.0, Spring Data JPA. Schema is always derived from the entities (no
+Java 25, Spring Boot 4.1.0, Spring Data JPA. Schema is always derived from the entities (no
 migration files) — `spring.jpa.hibernate.ddl-auto=update` on every profile. API docs are generated
 via springdoc-openapi.
 
@@ -212,10 +212,10 @@ SPRING_PROFILES_ACTIVE=postgresql DB_HOST=localhost DB_PASSWORD=... ./mvnw sprin
   [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
   (OpenAPI JSON at `/v3/api-docs`).
 
-Run it locally with the default H2 database (requires Java 26, see `backend/server/pom.xml`):
+Run it locally with the default H2 database (requires Java 25, see `backend/server/pom.xml`):
 
 ```sh
-brew install openjdk@26   # if not already installed
+brew install openjdk@25   # if not already installed
 cd backend/server
 ./mvnw spring-boot:run
 ```

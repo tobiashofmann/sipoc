@@ -27,7 +27,7 @@ SPRING_PROFILES_ACTIVE=postgresql DB_HOST=... DB_PASSWORD=... ./mvnw spring-boot
 
 Frontend (`cd frontend/sipoc-ui`): `npm install`, `npm start` (http://localhost:4200), `npm run build`, `npm test` (`ng test`), `npm run docs` (Compodoc).
 
-MCP server (`cd sipoc-mcp-server`): `npm run build`, `npm start`, `npm run dev`. Backend URL via `SIPOC_API_BASE_URL` (default `http://localhost:8080/api`). Must rebuild before `dist/` reflects changes.
+MCP server (`cd sipoc-mcp-server`): `npm run build`, `npm start`, `npm run dev`, `npm test` (node:test + tsx, mocked backend, specs in `test/`). Backend URL via `SIPOC_API_BASE_URL` (default `http://localhost:8080/api`). Must rebuild before `dist/` reflects changes.
 
 Seeding against a running backend: `cd tests && npm install && npm run seed`.
 

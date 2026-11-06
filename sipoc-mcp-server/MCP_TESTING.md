@@ -60,6 +60,17 @@ npx @modelcontextprotocol/inspector --cli node dist/index.js \
   --method tools/call --tool-name <tool> --tool-arg key=value
 ```
 
+## Automated unit tests
+
+Besides manual testing with the Inspector, the server has automated tests (Node's built-in test runner via `tsx`, no extra dependencies). They mock `fetch` and talk to the real tool registrations through an in-memory MCP client, so no backend is needed:
+
+```sh
+cd sipoc-mcp-server
+npm test
+```
+
+Specs live in `test/` (`apiClient`, `format`, `tools`).
+
 ## Troubleshooting
 
 | Symptom | Likely cause |

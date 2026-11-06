@@ -1,3 +1,6 @@
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { existsSync } from "node:fs";

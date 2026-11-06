@@ -1,3 +1,6 @@
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 /**
  * Type shapes actually used across the generic-typed API calls (`apiGet<T>`/`apiPost<T>`/...).
  * Most CRUD tools go through the generic factory (see crudFactory.ts) and pass responses through

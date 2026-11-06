@@ -2,6 +2,20 @@
   "name": "sipoc-mcp-server",
   "version": "1.0.0",
   "description": "MCP server exposing the SIPOC/LIPOK backend REST API as tools for LLM clients",
+  "author": {
+    "name": "Tobias Hofmann",
+    "email": "tobias.a.hofmann@gmail.com",
+    "url": "https://itsfullofstars.de"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/tobiashofmann/sipoc#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tobiashofmann/sipoc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tobiashofmann/sipoc/issues"
+  },
   "type": "module",
   "main": "dist/index.js",
   "scripts": {

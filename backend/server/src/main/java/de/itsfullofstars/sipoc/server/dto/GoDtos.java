@@ -1,3 +1,6 @@
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 package de.itsfullofstars.sipoc.server.dto;
 
 import de.itsfullofstars.sipoc.server.model.BoType;

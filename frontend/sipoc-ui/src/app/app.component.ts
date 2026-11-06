@@ -1,3 +1,6 @@
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 import { CUSTOM_ELEMENTS_SCHEMA, Component, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 

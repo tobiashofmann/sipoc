@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright 2026 Tobias Hofmann
+# SPDX-License-Identifier: Apache-2.0
 #
 # One-stop start/stop script for the SIPOCs solution:
 # backend (Spring Boot), frontend (Angular dev server), and mock data seeding.

@@ -1,3 +1,6 @@
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withXhr } from '@angular/common/http';

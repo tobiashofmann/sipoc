@@ -1,3 +1,6 @@
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 import { readFileSync } from "node:fs";
 
 /** Minimal RFC4180 CSV parser: handles quoted fields, embedded commas/quotes/newlines. */

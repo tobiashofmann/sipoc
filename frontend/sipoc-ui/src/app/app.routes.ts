@@ -1,3 +1,6 @@
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { BusinessPartnerListComponent } from './business-partners/business-partner-list.component';

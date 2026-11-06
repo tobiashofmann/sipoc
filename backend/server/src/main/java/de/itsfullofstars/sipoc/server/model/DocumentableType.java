@@ -1,3 +1,6 @@
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 package de.itsfullofstars.sipoc.server.model;
 
 /** Whether an {@link Input} or {@link Output} is free-text or a linked/attached document. */

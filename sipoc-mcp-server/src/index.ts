@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 /**
  * MCP server exposing the SIPOC backend REST API (see ../../SCHEMA.md) as tools over stdio, so an
  * MCP-aware LLM client can browse/edit SIPOCs and their master data.

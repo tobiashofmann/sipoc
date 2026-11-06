@@ -1,3 +1,6 @@
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 /** Base URL of the SIPOC backend's REST API; override via the `SIPOC_API_BASE_URL` env var. */
 export const API_BASE_URL = process.env.SIPOC_API_BASE_URL ?? "http://localhost:8080/api";
 

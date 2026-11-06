@@ -1,3 +1,6 @@
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodRawShape } from "zod";
 import { apiGet, apiPost, apiPatch, apiDelete, handleApiError } from "../services/apiClient.js";

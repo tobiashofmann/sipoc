@@ -1,3 +1,6 @@
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 /** Extracts the filename from a Content-Disposition header value, if present. */
 export function filenameFromContentDisposition(header: string | null): string | null {
   if (!header) {

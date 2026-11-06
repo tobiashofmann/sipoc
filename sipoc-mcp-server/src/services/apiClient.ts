@@ -1,3 +1,6 @@
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 import { API_BASE_URL } from "../constants.js";
 
 export type QueryParams = Record<string, string | number | boolean | undefined>;

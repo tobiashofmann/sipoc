@@ -1,3 +1,6 @@
+// Copyright 2026 Tobias Hofmann
+// SPDX-License-Identifier: Apache-2.0
+
 import { Injectable, computed, signal } from '@angular/core';
 
 /** Matches ui5-flexible-column-layout's own desktop breakpoint (>= 1024px shows up to 3 columns). */

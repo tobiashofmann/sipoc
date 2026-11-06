@@ -1,4 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2026 Tobias Hofmann
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -10,21 +15,32 @@
 	</parent>
 	<groupId>de.itsfullofstars.sipoc</groupId>
 	<artifactId>server</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
+	<version>1.0.0</version>
+	<name>sipoc-server</name>
+	<description>SIPOC (LIPOK) diagram manager backend REST API</description>
+	<url>https://github.com/tobiashofmann/sipoc</url>
 	<licenses>
-		<license/>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+			<distribution>repo</distribution>
+		</license>
 	</licenses>
 	<developers>
-		<developer/>
+		<developer>
+			<name>Tobias Hofmann</name>
+			<email>tobias.a.hofmann@gmail.com</email>
+			<url>https://itsfullofstars.de</url>
+		</developer>
 	</developers>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/tobiashofmann/sipoc/issues</url>
+	</issueManagement>
 	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
+		<connection>scm:git:https://github.com/tobiashofmann/sipoc.git</connection>
+		<developerConnection>scm:git:https://github.com/tobiashofmann/sipoc.git</developerConnection>
+		<url>https://github.com/tobiashofmann/sipoc</url>
 	</scm>
 	<properties>
 		<java.version>25</java.version>

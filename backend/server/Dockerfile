@@ -1,4 +1,6 @@
 # syntax=docker/dockerfile:1
+# Copyright 2026 Tobias Hofmann
+# SPDX-License-Identifier: Apache-2.0
 
 FROM eclipse-temurin:25-jdk AS build
 WORKDIR /build

@@ -1,3 +1,6 @@
+# Copyright 2026 Tobias Hofmann
+# SPDX-License-Identifier: Apache-2.0
+
 # Database selection: h2 (default) | mysql | postgresql — see the root README.md's "Backend"
 # section. One variable, COMPOSE_PROFILES, switches both which Spring profile the backend
 # activates and which optional database container starts

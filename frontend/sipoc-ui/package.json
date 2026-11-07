@@ -22,7 +22,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "docs": "compodoc -p tsconfig.app.json -d documentation",
-    "docs:serve": "compodoc -p tsconfig.app.json -d documentation -s"
+    "docs:serve": "compodoc -p tsconfig.app.json -d documentation -s",
+    "lint": "ng lint",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadlessCI --code-coverage"
   },
   "private": true,
   "dependencies": {
@@ -48,8 +50,11 @@
     "@angular/cli": "^22.2.6",
     "@angular/compiler-cli": "^22.2.4",
     "@compodoc/compodoc": "^2.0.0",
+    "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.3.4",
     "@types/jasmine": "~5.1",
+    "angular-eslint": "^22.6.0",
+    "eslint": "^9.39.5",
     "istanbul-lib-instrument": "^6.0.3",
     "jasmine-core": "~5.13",
     "karma": "~6.4.0",
@@ -59,6 +64,7 @@
     "karma-jasmine-html-reporter": "^2.3.0",
     "postcss": "^8.5.32",
     "tailwindcss": "^4.3.4",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1"
   }
 }

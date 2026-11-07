@@ -1,0 +1,142 @@
+# Copyright 2026 Tobias Hofmann
+# SPDX-License-Identifier: Apache-2.0
+
+name: CI
+
+# Lints, tests and measures code coverage for all three components.
+# Coverage is written as Cobertura XML, summarized in the job summary and kept as an artifact.
+# (GitHub Code Quality's coverage upload needs GitHub Team/Enterprise, so it is not used.)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (lint, test, coverage)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/server
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Lint (Checkstyle)
+        run: ./mvnw --batch-mode --no-transfer-progress checkstyle:check
+
+      - name: Test with coverage (JUnit + JaCoCo)
+        run: ./mvnw --batch-mode --no-transfer-progress verify
+
+      - name: Convert JaCoCo report to Cobertura
+        run: python3 ../../.github/scripts/jacoco_to_cobertura.py target/site/jacoco/jacoco.xml target/site/jacoco/cobertura.xml --source-root backend/server/src/main/java --repo-root ../..
+
+      - name: Coverage summary
+        if: ${{ !cancelled() }}
+        run: python3 ../../.github/scripts/coverage_summary.py "Backend" target/site/jacoco/cobertura.xml
+
+      - name: Keep test and coverage reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-reports
+          path: |
+            backend/server/target/surefire-reports
+            backend/server/target/site/jacoco
+          if-no-files-found: ignore
+
+  frontend:
+    name: Frontend (lint, test, coverage)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/sipoc-ui
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/sipoc-ui/package-lock.json
+
+      - run: npm ci
+
+      - name: Lint (angular-eslint)
+        run: npm run lint
+
+      - name: Test with coverage (Karma + Jasmine, headless Chrome)
+        run: npm run test:ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Coverage summary
+        if: ${{ !cancelled() }}
+        run: python3 ../../.github/scripts/coverage_summary.py "Frontend" coverage/cobertura.xml
+
+      - name: Keep coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-reports
+          path: frontend/sipoc-ui/coverage
+          if-no-files-found: ignore
+
+  mcp-server:
+    name: MCP server (lint, test, coverage)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sipoc-mcp-server
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: sipoc-mcp-server/package-lock.json
+
+      - run: npm ci
+
+      - name: Lint (Biome)
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Test with coverage (node:test + c8)
+        run: npm run test:coverage
+
+      - name: Coverage summary
+        if: ${{ !cancelled() }}
+        run: python3 ../.github/scripts/coverage_summary.py "MCP server" coverage/cobertura-coverage.xml
+
+      - name: Keep coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: mcp-server-reports
+          path: sipoc-mcp-server/coverage
+          if-no-files-found: ignore

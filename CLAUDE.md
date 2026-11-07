@@ -19,17 +19,23 @@ Whole stack (backend + frontend + seed mock data): `./sipoc.sh start|status|stop
 
 Backend (`cd backend/server`, uses bundled Maven wrapper):
 ```sh
+./mvnw checkstyle:check                 # lint (checkstyle.xml)
+./mvnw verify                           # tests + JaCoCo coverage (target/site/jacoco)
 ./mvnw spring-boot:run                  # http://localhost:8080, Swagger at /swagger-ui/index.html
 ./mvnw test                             # all tests
 ./mvnw test -Dtest=ClassName#method     # single test
 SPRING_PROFILES_ACTIVE=postgresql DB_HOST=... DB_PASSWORD=... ./mvnw spring-boot:run
 ```
 
-Frontend (`cd frontend/sipoc-ui`): `npm install`, `npm start` (http://localhost:4200), `npm run build`, `npm test` (`ng test`), `npm run docs` (Compodoc).
+Frontend (`cd frontend/sipoc-ui`): `npm install`, `npm start` (http://localhost:4200), `npm run build`, `npm test` (`ng test`), `npm run lint`, `npm run test:ci` (headless + Cobertura coverage in `coverage/`), `npm run docs` (Compodoc).
 
-MCP server (`cd sipoc-mcp-server`): `npm run build`, `npm start`, `npm run dev`, `npm test` (node:test + tsx, mocked backend, specs in `test/`). Backend URL via `SIPOC_API_BASE_URL` (default `http://localhost:8080/api`). Must rebuild before `dist/` reflects changes.
+MCP server (`cd sipoc-mcp-server`): `npm run build`, `npm start`, `npm run dev`, `npm test` (node:test + tsx, mocked backend, specs in `test/`), `npm run lint` (Biome), `npm run test:coverage` (c8, Cobertura). Backend URL via `SIPOC_API_BASE_URL` (default `http://localhost:8080/api`). Must rebuild before `dist/` reflects changes.
 
 Seeding against a running backend: `cd tests && npm install && npm run seed`.
+
+## CI
+
+`.github/workflows/ci.yml` lints, tests and measures coverage for backend, frontend and MCP server on pushes/PRs to `main`. Coverage is written as Cobertura XML, summarized in the job summary (`.github/scripts/coverage_summary.py`) and kept as a workflow artifact; JaCoCo output is converted by `.github/scripts/jacoco_to_cobertura.py`. GitHub Code Quality's coverage upload is not used (it needs GitHub Team/Enterprise). `main` is protected: work on feature branches and open PRs (see `.claude/skills/feature-branch-workflow`).
 
 ## Architecture notes
 

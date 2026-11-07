@@ -23,7 +23,9 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "clean": "rm -rf dist",
-    "test": "node --import tsx --test test/*.test.ts"
+    "test": "node --import tsx --test test/*.test.ts",
+    "lint": "biome lint .",
+    "test:coverage": "c8 --reporter=cobertura --reporter=text-summary --reporter=lcov --src=src --include='src/**' --exclude='src/index.ts' node --import tsx --test test/*.test.ts"
   },
   "engines": {
     "node": ">=18"
@@ -33,7 +35,9 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.6.6",
     "@types/node": "^26.6.6",
+    "c8": "^12.0.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   }

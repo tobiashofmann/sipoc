@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 SIPOC (a.k.a. "LIPOK" in code/German: Lieferant, Input, Prozess, Output, Kunde) diagram manager. Monorepo with four parts that talk over HTTP:
 
 - `backend/server` — Java 25 / Spring Boot 4.1 / Spring Data JPA REST API (package `de.itsfullofstars.sipoc.server`)
-- `frontend/sipoc-ui` — Angular 19 (standalone components, no NgModules) + SAP UI5 Web Components + Tailwind 4 + `@ngx-translate` (DE/EN)
+- `frontend/sipoc-ui` — Angular 22 (standalone components, no NgModules) + SAP UI5 Web Components + Tailwind 4 + `@ngx-translate` (DE/EN)
 - `sipoc-mcp-server` — Node/TypeScript MCP server (stdio) wrapping the backend REST API as tools
 - `tests/` — CSV mock data + `seed-mock-data.ts` loader (not unit tests); `*-en.csv` variants are the English data
 

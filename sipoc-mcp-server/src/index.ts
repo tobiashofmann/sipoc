@@ -18,7 +18,7 @@ import { API_BASE_URL } from "./constants.js";
 
 const server = new McpServer({
   name: "sipoc-mcp-server",
-  version: "1.0.0",
+  version: "0.6.0",
 });
 
 registerBusinessPartnerTools(server);

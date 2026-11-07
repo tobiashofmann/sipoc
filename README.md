@@ -1,19 +1,20 @@
 # SIPOCs
 
-![Banner image placeholder — replace with docs/banner.png](docs/banner.png)
+![SIPOCs banner: an example SIPOC diagram with suppliers, inputs, process steps, outputs and customers](docs/banner.png)
 
-[![Java](https://img.shields.io/badge/Java-26-ED8B00?logo=openjdk&logoColor=white)](backend/server/pom.xml)
+[![Java](https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white)](backend/server/pom.xml)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.0-6DB33F?logo=spring&logoColor=white)](backend/server/pom.xml)
-[![Angular](https://img.shields.io/badge/Angular-19-DD0031?logo=angular&logoColor=white)](frontend/sipoc-ui/package.json)
+[![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)](frontend/sipoc-ui/package.json)
 [![SAP UI5 Web Components](https://img.shields.io/badge/SAP%20UI5-Web%20Components-0854A0?logo=sap&logoColor=white)](frontend/sipoc-ui/package.json)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](frontend/sipoc-ui/package.json)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white)](frontend/sipoc-ui/package.json)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0%20%7C%207.0-3178C6?logo=typescript&logoColor=white)](frontend/sipoc-ui/package.json)
 [![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](docker-compose.yml)
 [![MCP](https://img.shields.io/badge/MCP-server-8A2BE2)](sipoc-mcp-server)
 
+> 📝 **Blog post (in German 🇩🇪):** [Probleme bei der Verwendung von Lipoks und die Lösung via KI](https://www.itsfullofstars.de/2026/11/probleme-bei-der-verwendung-von-lipoks-und-die-loesung-via-ki/) — the article is written in German only.
+
 An application for managing SIPOC diagrams (**S**upplier, **I**nput, **P**rocess, **O**utput,
-**C**ustomer) — a process-improvement/business-analysis tool. Also called "LIPOK" in the project
-(German: Lieferant, Input, Prozess, Output, Kunde).
+**C**ustomer) — a process-improvement/business-analysis tool. Also called "LIPOK" in the project (German: Lieferant, Input, Prozess, Output, Kunde).
 
 📄 **[Project overview / GitHub Pages](https://tobiashofmann.github.io/sipoc/)**
 
@@ -67,6 +68,13 @@ SIPOC for the procure-to-pay process
 |  |  | Release Payment |  |  |
 ```
 
+## Status
+
+Keep the following in mind before using it with real data:
+
+- **Data is lost on restart by default.** The default database is an **in-memory H2** database (profile `h2`).
+- **No authentication.**
+
 ## Quick start
 
 > (requires Java 25 and Node.js/npm to already be installed, see below)
@@ -112,10 +120,9 @@ set SIPOC_LANG=EN && sipoc.bat start
 
 If the project folder is on your `PATH`, you can also call it as `sipoc start` / `sipoc status` / `sipoc stop`. In PowerShell, the equivalent is usually `./sipoc.bat start` or `./sipoc.ps1 start`.
 
-## Quick start (Docker)
+### Docker
 
-No local Java/Node toolchain required — just Docker. `docker-compose.yml` builds and runs the
-backend and frontend as containers; `COMPOSE_PROFILES` picks the backend's database — H2 (default,
+`docker-compose.yml` builds and runs the backend and frontend as containers; `COMPOSE_PROFILES` picks the backend's database — H2 (default,
 no flag needed), MySQL, or PostgreSQL:
 
 | Database | Start | Stop (keep data) | Stop + wipe data |
@@ -127,16 +134,11 @@ no flag needed), MySQL, or PostgreSQL:
 - Backend: [http://localhost:8080](http://localhost:8080) (Swagger UI at `/swagger-ui/index.html`)
 - Frontend: [http://localhost:4200](http://localhost:4200)
 
-Same ports as the native setup below. With H2 (the default), data does not survive a restart, same
-as running natively. With MySQL/PostgreSQL, `COMPOSE_PROFILES` starts the matching database
-container alongside backend + frontend and points the backend at it in one go; data then persists
-in a Docker volume across `docker compose down`/`up` cycles — use `docker compose down -v` to also
-delete that volume and start from an empty database. Mock-data seeding is not wired into Compose;
-run it separately against whichever setup is running (see [Loading mock data](#loading-mock-data)
-below).
+Same ports as the native setup below. With MySQL/PostgreSQL, `COMPOSE_PROFILES` starts the matching database container. Data persists in a Docker volume.
 
-`COMPOSE_PROFILES` is a regular Docker Compose mechanism — it works the same via an exported shell
-variable, inline before the command (as above), or in a `.env` file next to `docker-compose.yml`:
+Mock-data seeding is not wired into Compose. Run it separately against whichever setup is running (see [Loading mock data](#loading-mock-data)).
+
+`COMPOSE_PROFILES` is a regular Docker Compose mechanism — it works the same via an exported shell variable, inline before the command (as above), or in a `.env` file next to `docker-compose.yml`:
 
 ```sh
 # .env
@@ -146,15 +148,12 @@ DB_USERNAME=sipoc
 DB_PASSWORD=change-me
 ```
 
-With that `.env` in place, a plain `docker compose up --build` picks it up automatically.
 `DB_NAME`/`DB_USERNAME`/`DB_PASSWORD` seed both the backend's datasource and the database
-container's own credentials, so they stay in sync — see `docker-compose.yml` for the full list of
-variables (including `DB_ROOT_PASSWORD` for MySQL's root user).
+container's own credentials, so they stay in sync — see `docker-compose.yml` for the full list of variables (including `DB_ROOT_PASSWORD` for MySQL's root user).
 
 ### Where the database files live (volume vs. host directory)
 
-Only the MySQL and PostgreSQL containers persist data (H2 is in-memory, so there is no file to
-map). By default `docker-compose.yml` stores the database files in a **named Docker volume** that
+By default `docker-compose.yml` stores the database files in a **named Docker volume** that
 Docker manages itself:
 
 | Database | Volume | Path inside the container |
@@ -164,12 +163,10 @@ Docker manages itself:
 
 Compose prefixes the volume name with the project (folder) name, so it shows up as e.g.
 `sipoc_mysql-data` in `docker volume ls`. `docker volume inspect sipoc_mysql-data` shows where
-Docker keeps it. This is the simplest option and works the same on every OS.
+Docker keeps it.
 
 To keep the files in a **directory on the Docker host** instead (easy to back up, inspect, or
-move), use a bind mount. Don't edit `docker-compose.yml`; create a `docker-compose.override.yml`
-next to it, which Compose merges in automatically (the entry with the same container path replaces
-the named volume):
+move), use a bind mount. Don't edit `docker-compose.yml`; create a `docker-compose.override.yml` next to it, which Compose merges in automatically (the entry with the same container path replaces the named volume):
 
 ```yaml
 # docker-compose.override.yml
@@ -240,7 +237,7 @@ flowchart LR
 See [`backend/server/README.md`](backend/server/README.md) for the full reference — standalone
 Docker build/run, generating Javadoc, running a single test, loading mock data directly, etc.
 
-Java 5, Spring Boot 4.1.0, Spring Data JPA. Schema is always derived from the entities (no
+Java 25, Spring Boot 4.1.0, Spring Data JPA. Schema is always derived from the entities (no
 migration files) — `spring.jpa.hibernate.ddl-auto=update` on every profile. API docs are generated
 via springdoc-openapi.
 
@@ -284,8 +281,7 @@ standalone Docker build/run, generating component docs (Compodoc), translations,
 
 Angular (standalone components, no NgModules) built on:
 
-- **[SAP UI5 Web Components](https://ui5.sap.com/)** (`@ui5/webcomponents` /
-  `@ui5/webcomponents-fiori`) for the UI widget library.
+- **OpenUI5 Web Components** (`@ui5/webcomponents` / `@ui5/webcomponents-fiori`) for the UI widget library.
 - **Tailwind CSS** for layout/utility styling.
 - **`@ngx-translate`** for i18n (German + English UI strings).
 
@@ -306,7 +302,7 @@ The app is then running on [http://localhost:4200](http://localhost:4200).
 
 An [MCP](https://modelcontextprotocol.io) (Model Context Protocol) server that exposes the
 backend's REST API as tools for LLM clients — one tool group per backend controller (business
-partners, inputs, process steps, outputs, gos, lipoks including linking/export). See
+partners, inputs, process steps, outputs, gos, SIPOC including linking/export). See
 [`sipoc-mcp-server/README.md`](sipoc-mcp-server/README.md) for the full tool list.
 
 **Build and run:**
@@ -353,15 +349,14 @@ claude mcp add sipoc-mcp-server -- node sipoc-mcp-server/dist/index.js
 }
 ```
 
-## Exporting a Lipok to Markdown
+## Exporting a SIPOC to Markdown
 
-Every Lipok (SIPOC instance) can be exported as Markdown, either from the frontend or directly
-against the backend API:
+Every SIPOC can be exported as Markdown, either from the frontend or directly against the backend API:
 
-- **Single Lipok** — the "Export" button in the SIPOC detail view, or `GET /api/lipoks/{id}/export`,
+- **Single SIPOC** — the "Export" button in the SIPOC detail view, or `GET /api/lipoks/{id}/export`,
   downloads one `.md` file named `<id>_<name>.md`.
-- **All Lipoks** — the "Export all" button in the SIPOC list view, or `GET /api/lipoks/export`,
-  downloads a `lipok-export.zip` containing one `.md` file per Lipok (same naming as above).
+- **All SIPOC** — the "Export all" button in the SIPOC list view, or `GET /api/lipoks/export`,
+  downloads a `lipok-export.zip` containing one `.md` file per SIPOC (same naming as above).
 
 The Markdown is generated by `LipokExportService.buildMarkdown()` (`backend/server`) and always
 has this structure — see [`docs/example-export.md`](docs/example-export.md) for a full example

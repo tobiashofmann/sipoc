@@ -15,7 +15,7 @@
 	</parent>
 	<groupId>de.itsfullofstars.sipoc</groupId>
 	<artifactId>server</artifactId>
-	<version>1.0.0</version>
+	<version>0.6.0</version>
 	<name>sipoc-server</name>
 	<description>SIPOC (LIPOK) diagram manager backend REST API</description>
 	<url>https://github.com/tobiashofmann/sipoc</url>

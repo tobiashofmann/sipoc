@@ -35,7 +35,7 @@ Seeding against a running backend: `cd tests && npm install && npm run seed`.
 
 ## CI
 
-`.github/workflows/ci.yml` lints, tests and measures coverage for backend, frontend and MCP server on pushes/PRs to `main`, and uploads Cobertura XML to GitHub Code Quality via `actions/upload-code-coverage` (JaCoCo output is converted by `.github/scripts/jacoco_to_cobertura.py`). `main` is protected: work on feature branches and open PRs (see `.claude/skills/feature-branch-workflow`).
+`.github/workflows/ci.yml` lints, tests and measures coverage for backend, frontend and MCP server on pushes/PRs to `main`. Coverage is written as Cobertura XML, summarized in the job summary (`.github/scripts/coverage_summary.py`) and kept as a workflow artifact; JaCoCo output is converted by `.github/scripts/jacoco_to_cobertura.py`. GitHub Code Quality's coverage upload is not used (it needs GitHub Team/Enterprise). `main` is protected: work on feature branches and open PRs (see `.claude/skills/feature-branch-workflow`).
 
 ## Architecture notes
 

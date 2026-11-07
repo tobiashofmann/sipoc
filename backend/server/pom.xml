@@ -125,6 +125,46 @@
 					<doclint>none</doclint>
 				</configuration>
 			</plugin>
+			<!-- Code coverage: `./mvnw verify` -> target/site/jacoco/jacoco.xml -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.16</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Lint: `./mvnw checkstyle:check` (rules in checkstyle.xml; fails on errors only) -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>3.6.0</version>
+				<configuration>
+					<configLocation>checkstyle.xml</configLocation>
+					<includeTestSourceDirectory>true</includeTestSourceDirectory>
+					<violationSeverity>error</violationSeverity>
+					<consoleOutput>true</consoleOutput>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>14.4.0</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 	</build>
 
